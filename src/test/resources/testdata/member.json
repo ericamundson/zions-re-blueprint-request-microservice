@@ -1,0 +1,70 @@
+[
+    {
+        "id": "34cfc788-d82e-61e0-bf5d-9eabfb8194dc",
+        "descriptor": "Microsoft.IdentityModel.Claims.ClaimsIdentity;c38f90d0-da54-455b-b1ae-c43b6009d294\\eric.amundson2@zionsbancorp.com",
+        "subjectDescriptor": "aad.MzRjZmM3ODgtZDgyZS03MWUwLWJmNWQtOWVhYmZiODE5NGRj",
+        "providerDisplayName": "Eric Amundson",
+        "isActive": true,
+        "members": [
+            
+        ],
+        "memberOf": [
+            
+        ],
+        "memberIds": [
+            
+        ],
+        "properties": {
+            "SchemaClassName": {
+                "$type": "System.String",
+                "$value": "User"
+            },
+            "Description": {
+                "$type": "System.String",
+                "$value": ""
+            },
+            "Domain": {
+                "$type": "System.String",
+                "$value": "c38f90d0-da54-455b-b1ae-c43b6009d294"
+            },
+            "Account": {
+                "$type": "System.String",
+                "$value": "eric.amundson2@zionsbancorp.com"
+            },
+            "DN": {
+                "$type": "System.String",
+                "$value": ""
+            },
+            "Mail": {
+                "$type": "System.String",
+                "$value": "eric.amundson2@zionsbancorp.com"
+            },
+            "SpecialType": {
+                "$type": "System.String",
+                "$value": "Generic"
+            },
+            "PUID": {
+                "$type": "System.String",
+                "$value": "aad:10033FFFA2B91934"
+            },
+            "ComplianceValidated": {
+                "$type": "System.DateTime",
+                "$value": "2022-08-16T00:00:00Z"
+            },
+            "http://schemas.microsoft.com/identity/claims/objectidentifier": {
+                "$type": "System.String",
+                "$value": "1919ae49-1e19-44ce-8b6a-006ff7a7a186"
+            },
+            "MetadataUpdateDate": {
+                "$type": "System.DateTime",
+                "$value": "2018-03-12T17:38:32Z"
+            },
+            "DirectoryAlias": {
+                "$type": "System.String",
+                "$value": "z091182"
+            }
+        },
+        "resourceVersion": 2,
+        "metaTypeId": 0
+    }
+]

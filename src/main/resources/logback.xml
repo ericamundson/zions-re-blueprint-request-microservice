@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- use Spring default values -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+   <appender name="CONSOLE"
+             class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+         <pattern>
+               %-4relative [%thread] %-5level %logger{30} - %msg%n
+         </pattern>
+      </encoder>
+   </appender>
+
+    <appender name="MONGODB" class="com.zions.common.services.slf4j.MongoAppender">
+        <collectionName>zions-re-blueprint-request-microservice-logs</collectionName>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="MONGODB"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

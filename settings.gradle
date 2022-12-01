@@ -1,0 +1,18 @@
+rootProject.name = 'zions-re-blueprint-request-microservice'
+if (!context || context != 'release') {
+	File settingDir = new File('./')
+	include ':zions-pipeline-services'
+	project(':zions-pipeline-services').projectDir = new File(settingDir, '../zions-pipeline-services')
+	include ':zions-xlr-services'
+	project(':zions-xlr-services').projectDir = new File(settingDir, '../zions-xlr-services')
+	include ':zions-xld-services'
+	project(':zions-xld-services').projectDir = new File(settingDir, '../zions-xld-services')
+	include ':zions-vsts-microservice'
+	project(':zions-vsts-microservice').projectDir = new File(settingDir, '../zions-service-framework/zions-vsts-microservice')
+	include ':zions-vsts-services'
+	project(':zions-vsts-services').projectDir = new File(settingDir, '../zions-service-framework/zions-vsts-services')
+	include ':zions-common'
+	project(':zions-common').projectDir = new File(settingDir, '../zions-service-framework/zions-common')
+	include ':zions-common-data'
+	project(':zions-common-data').projectDir = new File(settingDir, '../zions-service-framework/zions-common-data')
+}

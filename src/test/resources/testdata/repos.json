@@ -1,0 +1,290 @@
+[
+	{
+		"name": "TestBuildDefChanges",
+		"id": "376cb277-7cb2-402f-9eac-011abc027d5f"
+	},
+	{
+		"name": "devops",
+		"id": "39975586-2251-401e-a673-0adbb56be6f8"
+	},
+	{
+		"name": "quicktest",
+		"id": "1647bed8-c860-4ed3-9adf-0b2d0e9feca4"
+	},
+	{
+		"name": "brian_eda_test",
+		"id": "e3f9cd9e-54cc-4d39-b5b9-0d13cb4f6eff"
+	},
+	{
+		"name": "testrepocreateissue2",
+		"id": "54bec963-7b5b-4fcd-9abc-13ebd4ecbdf8"
+	},
+	{
+		"name": "koa",
+		"id": "ec06570f-f8ee-4e10-8e2f-20f3cfc571b5"
+	},
+	{
+		"name": "somethingwrong",
+		"id": "202a95a9-d33d-4710-a726-227dddd3ffd4"
+	},
+	{
+		"name": "genBlueprints",
+		"id": "f7466500-1b4d-4f31-8a16-290cd44a47a0"
+	},
+	{
+		"name": "digital.ai",
+		"id": "f841d5e8-ae07-413b-a14b-2f04b9319c05"
+	},
+	{
+		"name": "live-run-microservice",
+		"id": "35fc5fe8-5347-4705-8cd2-37080258072d"
+	},
+	{
+		"name": "uptest",
+		"id": "10f09467-1fa8-4485-af2c-395a8b594fba"
+	},
+	{
+		"name": "testk8sevents3",
+		"id": "41af1b8f-fdc4-4714-965e-396435b11a4c"
+	},
+	{
+		"name": "EricPRTitle1",
+		"id": "2ae7c648-dea7-4977-b131-3bd27a686cc8"
+	},
+	{
+		"name": "testoptimize3",
+		"id": "022d8f7c-a2d4-426d-9408-3eaf4ea99342"
+	},
+	{
+		"name": "whatever",
+		"id": "befb0381-1392-478f-8a40-3f9bad237591"
+	},
+	{
+		"name": "zions-nexusiq-test-ms",
+		"id": "3731bb9c-297f-4f24-8060-41c3b330d681"
+	},
+	{
+		"name": "postbit9test9",
+		"id": "a61b30c7-9149-4b3e-bccc-42f76b710d3a"
+	},
+	{
+		"name": "zions-service-framework",
+		"id": "55a728b7-37e3-4a44-9f28-489a855da6ef"
+	},
+	{
+		"name": "my-microservice",
+		"id": "9f4299bc-49a3-4b87-8ba1-4c484b7b97e2"
+	},
+	{
+		"name": "EricBTest",
+		"id": "b56fad16-53a5-4632-92d1-4fa3a65c19cd"
+	},
+	{
+		"name": "brian_test_yaml",
+		"id": "d9a36a79-9324-4c0c-aac8-5d886bb35be4"
+	},
+	{
+		"name": "website",
+		"id": "2fc19831-d658-441c-be44-5f04c90375fa"
+	},
+	{
+		"name": "testoptimize",
+		"id": "085b643f-43f0-4db4-b0ba-62dff810c1e0"
+	},
+	{
+		"name": "Test1_Ashwin",
+		"id": "6677843a-43c2-4c2a-b4b4-676380cfd7d0"
+	},
+	{
+		"name": "wthe",
+		"id": "d41c65c2-4554-4f04-8ed9-67fb5630938f"
+	},
+	{
+		"name": "EricPRTitles",
+		"id": "f896b94e-85b7-4051-8eec-6f27155e0407"
+	},
+	{
+		"name": "logtest5",
+		"id": "1b83a709-7332-463b-84f2-72cf80dc13e5"
+	},
+	{
+		"name": "ericui3",
+		"id": "d4e5c55c-631c-4173-948a-73b1278ec631"
+	},
+	{
+		"name": "testk8sevents4",
+		"id": "68f95e31-ffa2-43dd-89bd-7710e7a0a4a7"
+	},
+	{
+		"name": "dts-app-stack",
+		"id": "97314882-7947-467a-9557-78e4bdc7cfda"
+	},
+	{
+		"name": "e1",
+		"id": "d16fee78-6fd4-4ff2-ae47-79b57f7b8871"
+	},
+	{
+		"name": "testsomething",
+		"id": "b2f0b0ad-5919-436c-a024-7a883d5b207e"
+	},
+	{
+		"name": "testcreaterepo",
+		"id": "4ce0bf72-086c-415c-bb18-7abd9f32beb8"
+	},
+	{
+		"name": "deploymanifestfile",
+		"id": "5951377e-4ce7-4dbf-9934-7cc002a4d886"
+	},
+	{
+		"name": "zions-blueprints",
+		"id": "f1e7c39c-07a0-45cb-9a74-83af53d468ec"
+	},
+	{
+		"name": "websiteIV",
+		"id": "6ec4f663-df75-430d-b21e-86dde559dc7d"
+	},
+	{
+		"name": "newrepotest",
+		"id": "0271d61b-72b2-4197-a446-8874de13244e"
+	},
+	{
+		"name": "my-new-microservice",
+		"id": "767495b2-316f-4a71-a8af-89bb9a90e0bd"
+	},
+	{
+		"name": "testencode",
+		"id": "a9b0ab12-8c83-441c-84e1-8a5bbdd7f687"
+	},
+	{
+		"name": "testpattern1",
+		"id": "6b700d88-87d9-494d-99a0-8a780788c638"
+	},
+	{
+		"name": "DTS",
+		"id": "d93aafbe-8134-4936-8f38-8ba7442476d5"
+	},
+	{
+		"name": "EricExe",
+		"id": "6eb483fb-1b3f-4f68-b6e8-904c39be6595"
+	},
+	{
+		"name": "logtest3",
+		"id": "beb4eed1-c6f0-4e10-88e2-9a223dec38c4"
+	},
+	{
+		"name": "pipelines",
+		"id": "5ba3a3e4-2268-48e3-8b2e-9e84501d61bc"
+	},
+	{
+		"name": "logtest4",
+		"id": "d0a39d2e-a1ef-4f39-a4d3-a0c0a2a8ba49"
+	},
+	{
+		"name": "logtest",
+		"id": "4462d197-08f4-4dc4-863a-a1a1eb561058"
+	},
+	{
+		"name": "testyamlprocessing",
+		"id": "b2c1e418-fb11-4a9c-91af-b750dd46c557"
+	},
+	{
+		"name": "logtest2",
+		"id": "78c710ac-f609-4552-91f4-bbc4280cbd09"
+	},
+	{
+		"name": "postbit9test8",
+		"id": "e9befc47-b405-438e-88d5-bcd95fa25476"
+	},
+	{
+		"name": "logtest6",
+		"id": "7ceeef86-1929-4d37-a2df-bea5696e3960"
+	},
+	{
+		"name": "testk8sevents",
+		"id": "d56d8a9f-7b17-457a-9fb7-c54c6017e501"
+	},
+	{
+		"name": "testk8sevents2",
+		"id": "fe35066b-a4ba-4618-acac-ce4e0a34a3cc"
+	},
+	{
+		"name": "project_devops",
+		"id": "8de21b8b-0f00-45ea-af2d-d55c662453cf"
+	},
+	{
+		"name": "TestBuildDefChanges2",
+		"id": "062c1416-b6a4-4772-ba24-d78f8780155a"
+	},
+	{
+		"name": "AzureProvisioningToolingConfiguration",
+		"id": "e41c5461-de23-4556-9ccf-da186ee0cd75"
+	},
+	{
+		"name": "ericui2",
+		"id": "321bbdae-9911-4646-a0b1-db123bc4d8db"
+	},
+	{
+		"name": "Help2",
+		"id": "a40a866f-e1ce-4d1c-918a-dc0c2f93a77d"
+	},
+	{
+		"name": "zions-nexusiq-test-ms-release",
+		"id": "71d38637-a24c-4753-b77c-e042b5beed66"
+	},
+	{
+		"name": "brian-test-bp-cx.config",
+		"id": "ca675575-130c-480b-9a6b-e22faef3200e"
+	},
+	{
+		"name": "EricPRtitle5",
+		"id": "951d8a5f-893c-4cab-9335-e78ab4e4888c"
+	},
+	{
+		"name": "testoptimize2",
+		"id": "23fbeba1-e462-415b-b6ee-ea2e6df14d27"
+	},
+	{
+		"name": "xl-blueprints",
+		"id": "b79fd1fe-5d18-4389-9be2-eb637a22dd7c"
+	},
+	{
+		"name": "EricPRTitle2",
+		"id": "ebde077b-078d-46fb-a8ec-ec9be93136be"
+	},
+	{
+		"name": "bpadmin",
+		"id": "2c6e64d5-7751-4847-90d5-f000f7f16c54"
+	},
+	{
+		"name": "ericui6",
+		"id": "78318464-bf13-4b84-8db5-f2029ebbf728"
+	},
+	{
+		"name": "testnoxldbpproblems",
+		"id": "e44beddd-8c78-49d0-8512-f334da03dbc9"
+	},
+	{
+		"name": "zions-pipeline-cli",
+		"id": "125bd7f3-88fa-4044-bc4a-f3ac3741177c"
+	},
+	{
+		"name": "eric-microservice",
+		"id": "30b0acba-aafc-4ef3-9aba-f8282d269b69"
+	},
+	{
+		"name": "Help",
+		"id": "2176db68-1112-45f1-a24e-f87ec58872d3"
+	},
+	{
+		"name": "zions-watchdog-microservice",
+		"id": "15af426b-9dfa-4a1d-8e53-f962a90b8972"
+	},
+	{
+		"name": "logtest7",
+		"id": "34e407ad-2cae-49d0-8d73-fcf68305ea69"
+	},
+	{
+		"name": "ericui4",
+		"id": "96b1175c-3a43-47c7-9e70-ff362a297fa3"
+	}
+]
