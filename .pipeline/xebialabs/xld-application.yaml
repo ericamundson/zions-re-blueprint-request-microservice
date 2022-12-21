@@ -1,0 +1,72 @@
+---
+apiVersion: xl-deploy/v1
+kind: Applications
+spec:
+- name: Applications/DTS/dts-app-stack
+  type: core.Directory
+  children:
+  - name: zions-re-blueprint-request-microservice
+    type: udm.Application
+    children:
+    - name: !value "app_version"
+      type: udm.DeploymentPackage
+      orchestrator:
+      - sequential-by-container
+      deployables:
+        - name: run-image-promote-re-blueprintrequest
+          type: advcmd.Command
+          command: |-
+            {{java_install}}/java  {{proxy_settings}} -Dspring.profiles.active={{profile_setting}} -jar /app/azure/pipeline_tools/zions-pipeline-cli.jar promoteDockerImage --registry.namespace=dts --image.name=re-blueprintrequest --image.version=#{zions.buildnumber}#
+          createOrder: "90"
+          destroyOrder: "40"
+          alwaysRun: "true"
+          noopOrder: "90"
+          undoCommand: 'echo "No action needed for undoCommand"'
+          tags:
+          - prod
+        - name: set-helm-value-test-re-blueprintrequest
+          type: advcmd.Command
+          command: |-
+            {{java_install}}/java {{proxy_settings}} -Dspring.profiles.active={{profile_setting}} -jar /app/azure/pipeline_tools/zions-pipeline-cli.jar setHelmValue --helm.repo.name=dts-app-stack --project=DTS --repo.name=zions-re-blueprint-request-microservice --helm.values.file="re-microservices/values-test.yaml" --helm.property=reQueueConsumers.reBlueprintRequest.version --deploy.environment=test --app.version=#{zions.buildnumber}#
+          createOrder: "100"
+          destroyOrder: "50"
+          alwaysRun: "true"
+          noopOrder: "100"
+          undoCommand: 'echo "No action needed for undoCommand"'
+          tags:
+          - test
+          
+        - name: run-helm-test-re-blueprintrequest
+          type: advcmd.Command
+          command: |-
+            {{java_install}}/java {{proxy_settings}} -Dspring.profiles.active={{profile_setting}} -jar /app/azure/pipeline_tools/zions-pipeline-cli.jar runHelm --helm.repo=dts-app-stack --project.name=DTS --chart.folder=re-microservices --k8s.namespace.prefix=re-event-services --helm.release.name=rabbitmq-consumer-test --kubeconfig.vault.path=zions-service-framework --kubeconfig.vault.key=kubeconfig_general-int_test --deploy.environment=test --use.proxy={{use_proxy}} --git.tag=test_zions-re-blueprint-request-microservice_DTS_#{zions.buildnumber}#
+          createOrder: "110"
+          destroyOrder: "60"
+          alwaysRun: "true"
+          noopOrder: "110"
+          undoCommand: 'echo "No action needed for undoCommand"'
+          tags:
+          - test
+        - name: set-helm-value-prod-re-blueprintrequest
+          type: advcmd.Command
+          command: |-
+            {{java_install}}/java {{proxy_settings}} -Dspring.profiles.active={{profile_setting}} -jar /app/azure/pipeline_tools/zions-pipeline-cli.jar setHelmValue --helm.repo.name=dts-app-stack --project=DTS --repo.name=zions-re-blueprint-request-microservice --helm.values.file="re-microservices/values-prod.yaml" --helm.property=reQueueConsumers.reBlueprintRequest.version --deploy.environment=prod --app.version=#{zions.buildnumber}#
+          createOrder: "100"
+          destroyOrder: "50"
+          alwaysRun: "true"
+          noopOrder: "100"
+          undoCommand: 'echo "No action needed for undoCommand"'
+          tags:
+          - prod
+          
+        - name: run-helm-prod-re-blueprintrequest
+          type: advcmd.Command
+          command: |-
+            {{java_install}}/java {{proxy_settings}} -Dspring.profiles.active={{profile_setting}} -jar /app/azure/pipeline_tools/zions-pipeline-cli.jar runHelm --helm.repo=dts-app-stack --project.name=DTS --chart.folder=re-microservices --k8s.namespace.prefix=re-event-services --helm.release.name=rabbitmq-consumer-prod --kubeconfig.vault.path=zions-service-framework --kubeconfig.vault.key=kubeconfig_general-int_prod --deploy.environment=prod --use.proxy={{use_proxy}} --git.tag=prod_zions-re-blueprint-request-microservice_DTS_#{zions.buildnumber}#
+          createOrder: "110"
+          destroyOrder: "60"
+          alwaysRun: "true"
+          noopOrder: "110"
+          undoCommand: 'echo "No action needed for undoCommand"'
+          tags:
+          - prod

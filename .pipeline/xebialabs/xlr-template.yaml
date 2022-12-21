@@ -1,0 +1,98 @@
+---
+apiVersion: xl-release/v1
+kind: Templates
+spec:
+- directory: DTS
+  children:
+  - directory: dts-app-stack
+    children:
+
+# Setup template
+    - template: zions-re-blueprint-request-microservice - master
+      scriptUsername: svc-release
+      scriptUserPassword: !value "xlr_scriptUserPassword"
+      riskProfile: Default risk profile
+      variables:
+      - type: xlrelease.StringVariable
+        key: deploymentPackage.name
+        label: Deployment Package Name
+        description: The application deployment package name
+        value: 6.4.0-00046
+      phases:
+# emails james.mcnabb@zionsbancorp.com
+# phase Test
+      - phase: Test
+        tasks:
+#  XLD
+        - name: 'XLD: Deploy'
+          type:  xlrelease.SequentialGroup
+          tasks: 
+          - name: 'Deploy ${deploymentPackage.name} to Test '
+            type: xldeploy.Deploy
+            server: XL Deploy Server
+            deploymentPackage:   Applications/DTS/dts-app-stack/zions-re-blueprint-request-microservice/${deploymentPackage.name}
+            deploymentEnvironment:   Environments/DTS/dts-app-stack/Test
+            rollbackOnFailure: false
+            cancelOnError: false
+            failOnPause: false
+        - name: Notify QA of installation on Test
+          type: xlrelease.NotificationTask
+  
+          addresses:
+          - james.mcnabb@zionsbancorp.com
+          body: |-
+            ## A new version of ** zions-re-blueprint-request-microservice ** is ready for review in Test
+            ### ${deploymentPackage.name}
+            When you have validated the changes are ready for Stage release, please approve the version in XLRelease.
+          subject: ' zions-re-blueprint-request-microservice : ${deploymentPackage.name} is deployed to test.'
+        - name: BSA Approval
+          type: xlrelease.GateTask
+          description: 'Permission to promote version: ${deploymentPackage.name} from Test'
+          team: BSA
+# emails james.mcnabb@zionsbancorp.com
+# phase Prod
+      - phase: Prod
+        tasks:
+# Ensure CRQ in Production phase
+        - name: Confirm CRQ
+          type: xlrelease.GateTask
+          conditions:
+          - name: None
+            type: xlrelease.GateCondition
+#  XLD
+        - name: 'XLD: Deploy'
+          type:  xlrelease.SequentialGroup
+          tasks: 
+          - name: 'Deploy ${deploymentPackage.name} to Prod '
+            type: xldeploy.Deploy
+            server: XL Deploy Server
+            deploymentPackage:   Applications/DTS/dts-app-stack/zions-re-blueprint-request-microservice/${deploymentPackage.name}
+            deploymentEnvironment:   Environments/DTS/dts-app-stack/Prod
+            rollbackOnFailure: false
+            cancelOnError: false
+            failOnPause: false
+  
+        - name: Notify All of installation on Prod
+          type: xlrelease.NotificationTask
+          addresses:
+          - james.mcnabb@zionsbancorp.com
+          body: |-
+            ## ${deploymentPackage.name} ** zions-re-blueprint-request-microservice **  has gone live!
+          subject: ' zions-re-blueprint-request-microservice : ${deploymentPackage.name} is deployed to production.'
+# emails 
+#  XLD
+    - type: xlrelease.Dashboard
+      owner: z091182
+      tiles:
+      - name: Release progress
+        type: xlrelease.ReleaseProgressTile
+      - name: Release summary
+        type: xlrelease.ReleaseSummaryTile
+      - name: Resource usage
+        type: xlrelease.ResourceUsageTile
+      - name: Release timeline
+        type: xlrelease.TimelineTile
+      - name: Release health
+        type: xlrelease.ReleaseHealthTile
+  
+      parentTemplate: zions-re-blueprint-request-microservice - Master
