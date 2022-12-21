@@ -1,5 +1,4 @@
-[
- {
+{
   "name": "zions-blueprints",
   "url": "https://dev.azure.com/zionseto/DTS/_git/zions-blueprints",
   "repo": {
@@ -11180,5 +11179,4 @@
   },
   "version": "1",
   "id": "637e29c3f6709b178d296bf5"
- }
-]
+}

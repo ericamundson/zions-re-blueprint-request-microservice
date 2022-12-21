@@ -1,0 +1,91 @@
+[
+ {
+  "name": "",
+  "timestamp": "2022.12.07 09:05:12.685 CST",
+  "pipelineId": "DevSandbox_0221ebee-32d9-42d4-ab06-361a5ce074cf",
+  "log": "Process blueprint",
+  "contexts": [
+    "Process blueprint"
+  ],
+  "logType": "ContextStart"
+ },
+ {
+  "name": "",
+  "timestamp": "2022.12.07 09:05:13.076 CST",
+  "pipelineId": "DevSandbox_0221ebee-32d9-42d4-ab06-361a5ce074cf",
+  "log": "com.zions.pipeline.services.blueprint.model.BlueprintExecuteDto(DevSandbox_0221ebee-32d9-42d4-ab06-361a5ce074cf, DevSandbox, https://dev.azure.com/zionseto/DTS/_git/zions-blueprints, project-ado-composite, common, https://eto-dev@dev.azure.com/eto-dev/DTS/_git/devops, maven, refs/heads/master, , LSBQcm9qZWN0TmFtZT1EZXZTYW5kYm94Ci0gUmVwb05hbWU9ZGV2b3BzCi0gQnVpbGRJbmNsdWRlcz1uL2EKLSBCdWlsZEJyYW5jaGVzPW1hc3RlcgotIEJ1aWxkVHlwZT1tYXZlbgotIEFwcEFyZWE9bWF2ZW4KLSBDb21wb25lbnRCdWlsZD1mYWxzZQotIERvVmVyc2lvblNldD10cnVlCi0gQnVpbGRHb2FsPWluc3RhbGwKLSBQb21GaWxlTmFtZT1wb20ueG1sCi0gQWRkaXRpb25hbE1hdmVuQnVpbGRPcHRpb25zPW4vYQo=, {{.AppArea}}/.pipeline, null)",
+  "contexts": [
+    "Process blueprint"
+  ],
+  "logType": "Info"
+ },
+ {
+  "name": "",
+  "timestamp": "2022.12.07 09:05:13.424 CST",
+  "pipelineId": "DevSandbox_0221ebee-32d9-42d4-ab06-361a5ce074cf",
+  "log": "Run blueprint: project-ado-composite",
+  "contexts": [
+    "Process blueprint",
+    "Run blueprint: project-ado-composite"
+  ],
+  "logType": "ContextStart"
+ },
+ {
+  "name": "",
+  "timestamp": "2022.12.07 09:07:28.299 CST",
+  "pipelineId": "DevSandbox_0221ebee-32d9-42d4-ab06-361a5ce074cf",
+  "log": "OS Command: cmd args: /c \"E:\\bin\\xlcli\\xl.exe\" blueprint --config \"E:\\repostest\\DTS\\devops\\maven/.pipeline/.xebialabs/config.yaml\" -a \"E:\\repostest\\DTS\\devops\\maven/.pipeline/answers.yaml\" -b \"common/project-ado-composite\" -s",
+  "contexts": [
+    "Process blueprint",
+    "Run blueprint: project-ado-composite"
+  ],
+  "logType": "Info"
+ },
+ {
+  "name": "",
+  "timestamp": "2022.12.07 09:08:38.204 CST",
+  "pipelineId": "DevSandbox_0221ebee-32d9-42d4-ab06-361a5ce074cf",
+  "log": "[dataPrep] Using answer file value [DevSandbox] for variable [ProjectName]\r\n[dataPrep] Using answer file value [devops] for variable [RepoName]\r\n[dataPrep] Using answer file value [n/a] for variable [BuildIncludes]\r\n[dataPrep] Using answer file value [master] for variable [BuildBranches]\r\n[dataPrep] Using answer file value [maven] for variable [BuildType]\r\n[dataPrep] Using answer file value [maven] for variable [AppArea]\r\n[dataPrep] Using answer file value [false] for variable [ComponentBuild]\r\n[dataPrep] Using answer file value [true] for variable [DoVersionSet]\r\n[dataPrep] Using answer file value [install] for variable [BuildGoal]\r\n[dataPrep] Using answer file value [pom.xml] for variable [PomFileName]\r\n[dataPrep] Using answer file value [n/a] for variable [AdditionalMavenBuildOptions]\r\n[file] Blueprint output file 'xebialabs\\values.xlvals' generated successfully\r\n[file] Blueprint output file 'xebialabs\\secrets.xlvals' generated successfully\r\n[file] Blueprint output file 'xebialabs\\.gitignore' generated successfully\r\n[file] Blueprint output file 'ado/ci-steps.yaml' generated successfully\r\n[file] Blueprint output file 'ado/release-steps.yaml' generated successfully\r\n[file] Blueprint output file 'job/deployment-template.yaml' generated successfully\r\n[file] Blueprint output file 'ado/ci-pipeline.yaml' generated successfully\r\n[file] Blueprint output file 'ado/release-pipeline.yaml' generated successfully\r\n[file] Blueprint output file 'ado/vars.yaml' generated successfully\r\nPlease refer to file 'xebialabs/secrets.xlvals' for the default secrets\r\n\r\n\r\nTBD\r\n",
+  "contexts": [
+    "Process blueprint",
+    "Run blueprint: project-ado-composite"
+  ],
+  "logType": "Info"
+ },
+ {
+  "name": "",
+  "timestamp": "2022.12.07 09:08:38.545 CST",
+  "pipelineId": "DevSandbox_0221ebee-32d9-42d4-ab06-361a5ce074cf",
+  "log": "Run blueprint: project-ado-composite",
+  "contexts": [
+    "Process blueprint"
+  ],
+  "logType": "ContextComplete"
+ },
+ {
+  "name": "",
+  "timestamp": "2022.12.07 09:08:38.869 CST",
+  "pipelineId": "DevSandbox_0221ebee-32d9-42d4-ab06-361a5ce074cf",
+  "log": "Blueprint generated from templates",
+  "contexts": [],
+  "logType": "ContextComplete"
+ },
+ {
+  "name": "",
+  "timestamp": "2022.12.07 09:08:39.190 CST",
+  "pipelineId": "DevSandbox_0221ebee-32d9-42d4-ab06-361a5ce074cf",
+  "log": "Run preprocess executables.",
+  "contexts": [
+    "Run preprocess executables."
+  ],
+  "logType": "ContextStart"
+ },
+ {
+  "name": "",
+  "timestamp": "2022.12.07 09:08:39.639 CST",
+  "pipelineId": "DevSandbox_0221ebee-32d9-42d4-ab06-361a5ce074cf",
+  "log": "Run preprocess executables.",
+  "contexts": [],
+  "logType": "ContextComplete"
+ }
+]
