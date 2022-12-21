@@ -28,7 +28,11 @@ import spock.lang.Ignore
 import spock.lang.Specification
 import spock.mock.DetachedMockFactory
 import com.zions.pipeline.services.blueprint.BlueprintRepoService
-import com.zions.blueprint.pipeline.services.blueprint.model.*
+import com.zions.pipeline.services.blueprint.db.BlueprintRepo
+import com.zions.pipeline.services.blueprint.model.*
+import com.zions.pipeline.services.db.PipelineLogItem
+import com.zions.pipeline.services.feedback.FeedbackService
+import com.zions.pipeline.services.feedback.model.LogNode
 import com.mongodb.MongoCredential
 import com.mongodb.ServerAddress
 
@@ -41,22 +45,29 @@ class BlueprintRequestControllerSpec extends Specification {
 	BlueprintRepoService blueprintRepoService = Stub()
 	
 	@SpringBean
-	DataGenerationService dataGenerationService = new DataGenerationService()
+	BlueprintRequestController underTest = new BlueprintRequestController()
+	
+	@SpringBean
+	FeedbackService feedbackService = new FeedbackService()
 
-	def 'Query for repositories'() {
+	def 'Get list of all repositories'() {
 		setup: 'test data for stubs'
-		def repos = dataGenerationService.generate('/testdata/repos.json')
-		
+		String json = this.getClass().getResource('/testdata/repos.json').text
+		def repos =  new JsonSlurper().parseText(json)
+		//def repos = dataGenerationService.generate('/testdata/repos.json')
+		//def repos = dataGenerationService.generate('/testdata/repos.json', true)
 		underTest.blueprintRepoService = blueprintRepoService
 		
-		List<Folder> orepos = []
+		List<BlueprintRepo> orepos = []
 		for (def r in repos) {
-			Folder or = new Folder(r)
-			orepos.add(op)
+			println("Adding ${r}")
+			BlueprintRepo or = new BlueprintRepo(r)
+			orepos.add(or)
 		}
+		println("BlueprintRepo list: \n${orepos}")
 		
-		and: 'stub getProjects'
-		blueprintRepoService.getAllRepos(_) >> { args ->
+		and: 'stub getAllRepos'
+		blueprintRepoService.getAllRepos() >> { args ->
 			return orepos
 		}
 		
@@ -66,6 +77,63 @@ class BlueprintRequestControllerSpec extends Specification {
 		then:
 		trepos.size() > 0 
 		println "Blueprint repo count: ${trepos.size()}"
+		
+	}
+	
+	def 'Get blueprint repository by name'() {
+		setup: 'test data for stubs'
+		String json = this.getClass().getResource('/testdata/repo_by_name.json').text
+		def repo =  new JsonSlurper().parseText(json)
+		underTest.blueprintRepoService = blueprintRepoService
+		
+		Folder repoAsFolder = new Folder(repo.repo.name)
+		repoAsFolder.folders = repo.repo.folders
+		repoAsFolder.blueprints = repo.repo.blueprints
+		BlueprintRepo orepo = new BlueprintRepo(repo.name, repo.url, repoAsFolder)
+		println("BlueprintRepo: \n${orepo}")
+		
+		and: 'stub getAllRepos'
+		blueprintRepoService.getRepoByName(_) >> { args ->
+			return orepo
+		}
+		
+		when: 'run web request for getRepositories'
+		Folder trepo = underTest.getBlueprintRepoByName('zions-blueprints')
+		
+		then:
+		trepo.name.equals("zions-blueprints") 
+		println "Blueprint repo name: ${trepo.name}"
+		
+	}
+	
+	def 'Get logs for blueprint execution'() {
+		setup: 'test data for stubs'
+		String json = this.getClass().getResource('/testdata/execution_logs.json').text
+		def logs =  new JsonSlurper().parseText(json)
+		//def repos = dataGenerationService.generate('/testdata/repos.json')
+		//def repos = dataGenerationService.generate('/testdata/repos.json', true)
+		underTest.blueprintRepoService = blueprintRepoService
+		
+		List<PipelineLogItem> ilogs = []
+		for (def l in logs) {
+			//println("Adding ${l}")
+			PipelineLogItem oln = new PipelineLogItem(l)
+			ilogs.add(oln)
+		}
+
+		List<LogNode> ologs = feedbackService.buildLogNodes(logs)
+		
+		and: 'stub getBlueprintExecutionLogs'
+		blueprintRepoService.getBlueprintExecutionLogs(_) >> { args ->
+			return ologs
+		}
+		
+		when: 'run web request for getExecutionLogs'
+		List<LogNode> elogs = underTest.getExecutionLogs()
+		
+		then:
+		elogs.size() > 0 
+		println "Blueprint execution logs: ${elogs.size()}"
 		
 	}
 	

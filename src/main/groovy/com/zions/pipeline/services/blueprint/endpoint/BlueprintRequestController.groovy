@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity;
 import com.zions.pipeline.services.blueprint.model.*
 import com.zions.pipeline.services.blueprint.BlueprintRepoService
-import com.zions.pipeline.services.mixins.FeedbackTrait
-import com.zions.pipeline.services.yaml.template.RemoteBlueprintTemplateInterpretorService
+import com.zions.pipeline.services.blueprint.BlueprintExecutorService
+import com.zions.pipeline.services.feedback.model.LogNode
 import groovy.json.JsonBuilder
 import groovy.util.logging.Slf4j
 
@@ -16,12 +16,12 @@ import groovy.util.logging.Slf4j
 @Slf4j
 @RestController
 @RequestMapping('blueprint')
-class BlueprintRequestController implements FeedbackTrait {
+class BlueprintRequestController {
 	@Autowired
 	BlueprintRepoService blueprintRepoService
 	
 	@Autowired
-	RemoteBlueprintTemplateInterpretorService remoteBlueprintTemplateInterpretorService
+	BlueprintExecutorService blueprintExecutorService
 	
 	@GetMapping('repositories')
 	List<Folder> getRepositories() {
@@ -38,28 +38,8 @@ class BlueprintRequestController implements FeedbackTrait {
 	
 	@PostMapping('execute')
 	Object executeBlueprint(@RequestBody BlueprintExecuteDto bpExecuteData) {
-		String executionId = "${bpExecuteData.executionId}"
-		logContextStart(executionId, "Process blueprint")
-
-		logInfo(pipelineId, bpExecuteData)
-		//def answers = bpExecuteData.answers
-		//println "Answers:  ${answers}"
-		remoteBlueprintTemplateInterpretorService.outputPipeline(bpExecuteData)
-		logContextComplete(executionId, "Blueprint generated from templates")
-		// Probably don't need anything after this
-		if (runViaMicroservice) {
-			def result = remoteBlueprintTemplateInterpretorService.runExecutableYaml(true)
-
-			remoteBlueprintTemplateInterpretorService.runPullRequestOnChanges()
-			if (result && result.isComplete) {
-				logContextStart(executionId, "Completed")
-				logCompleted(executionId, "Blueprint processing is complete!")
-				logContextComplete(executionId, "Completed")
-			}
-		} else {
-			remoteBlueprintTemplateInterpretorService.runExecutableYaml()
-		}
-
+		// do I need to start a separate thread here for the bluprint execution
+		blueprintExecutorService.executeBlueprint(bpExecuteData)
 		return null
 	}
 
@@ -67,10 +47,27 @@ class BlueprintRequestController implements FeedbackTrait {
 	Folder getBlueprintRepoByName(@PathVariable String name) {
 		Folder aRepo = null
 		def bpRepo = blueprintRepoService.getRepoByName(name)
-		if (repo != null) {
-			aRepo = new Folder(bpRepo.json)
+		if (bpRepo != null) {
+			aRepo = (Folder)bpRepo.repo
 		}
 		return aRepo
 	}
+
+	@GetMapping('executionLogs/{executionId}')
+	List<LogNode> getExecutionLogs(@PathVariable String executionId) {
+		log.info("Calling getBlueprintExecutionLogs ...")
+		LogNode[] logNodes = blueprintRepoService.getBlueprintExecutionLogs(executionId)
+		log.info("Returning blueprint execution logs: \n ${logNodes}")
+		return logNodes
+	}
 	
+	@GetMapping('checkStatus/{executionId}')
+	Object getExecutionStatus(@PathVariable String executionId) {
+		log.info("Getting BlueprintExecutionLogs to check status ...")
+		LogNode[] logNodes = blueprintRepoService.getBlueprintExecutionLogs(executionId)
+		// check for logNode type / context
+		log.info("Returning blueprint execution status ...")
+		return ["status": "Running", "result": "Succeeded"]
+	}
+
 }

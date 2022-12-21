@@ -91,7 +91,7 @@ if (bootstrap.exists()) {
 				image = "${registryHostUrl}/official/openjdk:alpine"
 			}
 			to {
-				image = "${registryHostUrl}/dts/re-adorequest"
+				image = "${registryHostUrl}/dts/re-blueprintrequest"
 				tags = [project.version]
 				auth {
 				  username = "${project.secretData.data.data['nexus.docker.user']}"

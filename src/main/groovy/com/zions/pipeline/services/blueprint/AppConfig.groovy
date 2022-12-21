@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
+import org.springframework.context.annotation.Scope
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -28,6 +29,7 @@ import com.zions.mr.services.rest.MrGenericRestClient
 import com.zions.vsts.services.rmq.mixins.MessageFanoutConfigTrait
 import com.zions.vsts.services.tfs.rest.MultiUserGenericRestClient
 import com.zions.pipeline.services.feedback.LogCallbackHandler
+import com.zions.pipeline.services.yaml.template.RemoteBlueprintTemplateInterpretorService
 import com.zions.vsts.services.tfs.rest.IFailureHandler
 
 @Configuration
@@ -77,6 +79,12 @@ public class AppConfig  {
 		return new MrGenericRestClient('', '')
 	}
 
+	@Bean
+	@Scope('prototype')
+	RemoteBlueprintTemplateInterpretorService remoteBlueprintTemplateInterpretorService() {
+		RemoteBlueprintTemplateInterpretorService s = new RemoteBlueprintTemplateInterpretorService()
+		return s
+	}
 
 	@Autowired
 	@Value('${cache.location:none}')
