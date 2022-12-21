@@ -1,0 +1,23 @@
+name: $(date:yyyyMMdd)$(rev:.rrr)
+
+parameters:
+- name: pool_name
+  displayName: Pool Name
+  type: string
+  default: On-Prem Production
+  values:
+  - On-Prem Production
+  - On-Prem DR
+
+resources:
+  repositories:
+    - repository: pipelines
+      type: git
+      name: DTS/devops
+
+trigger: none
+
+extends:
+  template: dts-app-stack/.pipeline/ado/ci-pipeline.yaml@pipelines
+  parameters:
+    pool_name: ${{ parameters.pool_name }}

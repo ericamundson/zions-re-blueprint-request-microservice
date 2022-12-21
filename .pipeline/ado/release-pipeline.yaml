@@ -1,0 +1,45 @@
+name: $(date:yyyyMMdd)$(rev:.rrr)
+
+parameters:
+- name: pool_name
+  displayName: Pool Name
+  type: string
+  default: On-Prem Production
+  values:
+  - On-Prem Production
+  - On-Prem DR
+- name: env_name
+  displayName: Deploy Environment
+  type: string
+  default: Test
+  values:
+  - Dev
+  - Test
+
+resources:
+  repositories:
+    - repository: pipelines
+      type: git
+      name: DTS/devops
+trigger:
+  branches:
+    include:
+    - 'master'
+  paths:
+    include:
+    - 'src/*'
+
+extends:
+  template: dts-app-stack/.pipeline/ado/release-pipeline.yaml@pipelines
+  parameters:
+    pool_name: ${{ parameters.pool_name }}
+    tb_InitialVersionPrefix: 1.0.0
+    env_name: ${{ parameters.env_name }}
+    dt_crt_templatetitle_prefix: DTS/dts-app-stack/zions-re-blueprint-request-microservice
+    dt_crt_releasetitle_prefix: zions-re-blueprint-request-microservice
+    nexusiq_scan:
+    - skip: false
+      applicationId: "zions-re-blueprint-request-microservice"
+      scanTargets: "build/libs/*.jar"
+    token_replace_list: |
+      xebialabs/xld-application.yaml

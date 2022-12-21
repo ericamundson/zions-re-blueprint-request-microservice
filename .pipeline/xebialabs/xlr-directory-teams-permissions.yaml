@@ -1,0 +1,183 @@
+---
+apiVersion: xl-release/v1
+kind: Templates
+spec:
+- directory: DTS
+---
+apiVersion: xl-release/v1
+kind: Permissions
+spec:
+- directory: DTS
+  teams:
+  - name: Folder Owner
+    roles:
+    - AppEng
+    permissions:
+    - folder#edit_variables
+    - release#edit_precondition
+    - release#edit
+    - folder#edit_configuration
+    - group#view
+    - release#lock_task
+    - delivery_pattern#view
+    - group#edit
+    - template#lock_task
+    - folder#view
+    - release#edit_task_script
+    - release#edit_task_configuration_facet
+    - release#edit_task_flag
+    - release#edit_task_dates
+    - dashboard#view
+    - release#edit_task
+    - release#task_transition
+    - release#edit_task_attachments
+    - delivery_pattern#edit
+    - release#reassign_task
+    - release#edit_task_input_output_properties
+    - release#edit_task_tags
+    - delivery#edit
+    - template#create_release
+    - release#edit_task_description
+    - release#view
+    - delivery#view
+    - delivery#edit_tracked_item
+    - release#start
+    - release#edit_blackout
+    - release#edit_failure_handler
+    - template#edit_precondition
+    - dashboard#edit
+    - release#abort
+    - folder#edit
+    - template#edit_failure_handler
+  - name: Release Admin
+    permissions:
+    - folder#edit_variables
+    - release#edit_precondition
+    - release#edit
+    - template#edit
+    - group#view
+    - release#lock_task
+    - delivery_pattern#view
+    - group#edit
+    - folder#view
+    - release#edit_task_configuration_facet
+    - release#edit_task_dates
+    - dashboard#view
+    - release#edit_task
+    - release#task_transition
+    - release#edit_task_attachments
+    - delivery_pattern#edit
+    - release#reassign_task
+    - delivery#edit
+    - template#create_release
+    - release#edit_task_description
+    - release#view
+    - folder#edit_teams
+    - delivery#view
+    - delivery#edit_tracked_item
+    - release#start
+    - release#edit_blackout
+    - template#view
+    - release#edit_failure_handler
+    - template#edit_triggers
+    - template#edit_precondition
+    - dashboard#edit
+    - folder#edit_security
+    - release#abort
+    - folder#edit
+  - name: Template Owner
+    roles:
+    - AppEng
+    permissions:
+    - folder#edit_variables
+    - release#edit_precondition
+    - release#edit
+    - folder#edit_configuration
+    - template#edit
+    - group#view
+    - delivery_pattern#view
+    - group#edit
+    - template#lock_task
+    - folder#view
+    - release#edit_task_script
+    - release#edit_task_configuration_facet
+    - release#edit_task_flag
+    - release#edit_task_dates
+    - dashboard#view
+    - release#task_transition
+    - release#edit_task_attachments
+    - delivery_pattern#edit
+    - release#edit_task_input_output_properties
+    - release#edit_task_tags
+    - delivery#edit
+    - template#create_release
+    - release#edit_task_description
+    - release#view
+    - delivery#view
+    - delivery#edit_tracked_item
+    - release#start
+    - template#view
+    - template#edit_triggers
+    - template#edit_precondition
+    - dashboard#edit
+    - release#abort
+    - folder#edit
+    - template#edit_failure_handler
+  - name: Dev
+    permissions:
+    - template#view
+    - folder#view
+    - dashboard#view
+    - release#view
+  - name: BSA
+    permissions:
+    - release#edit_precondition
+    - release#edit
+    - release#edit_task_attachments
+    - delivery_pattern#edit
+    - release#reassign_task
+    - delivery#edit
+    - template#create_release
+    - group#view
+    - release#view
+    - delivery_pattern#view
+    - group#edit
+    - delivery#view
+    - delivery#edit_tracked_item
+    - release#start
+    - release#edit_blackout
+    - template#view
+    - folder#view
+    - dashboard#edit
+    - release#abort
+    - release#edit_task_configuration_facet
+    - release#edit_task_dates
+    - dashboard#view
+    - release#edit_task
+  - name: QA
+    permissions:
+    - template#view
+    - folder#view
+    - dashboard#view
+    - release#view
+  - name: DBA
+    permissions:
+    - release#edit_precondition
+    - release#edit
+    - release#task_transition
+    - release#edit_task_attachments
+    - delivery_pattern#edit
+    - template#edit
+    - release#reassign_task
+    - release#edit_task_input_output_properties
+    - group#view
+    - release#view
+    - delivery_pattern#view
+    - delivery#view
+    - template#view
+    - release#edit_failure_handler
+    - folder#view
+    - template#edit_precondition
+    - release#edit_task_script
+    - release#edit_task_configuration_facet
+    - dashboard#view
