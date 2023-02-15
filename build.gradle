@@ -207,6 +207,7 @@ dependencies {
 		compile 'com.zions.dts.services:zions-vsts-services:latest.release'
 		compile 'com.zions.dts.services:zions-vsts-microservice:latest.release'
 		compile 'com.zions.dts.services:zions-common:latest.release'
+//		compile 'com.zions.dts.services:zions-common-data:latest.release'
 	} else {
 		compile project(':zions-pipeline-services')
 		compile project(':zions-xld-services')
