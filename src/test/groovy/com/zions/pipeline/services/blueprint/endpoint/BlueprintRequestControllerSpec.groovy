@@ -27,7 +27,6 @@ import com.zions.xld.services.rest.client.XldGenericRestClient
 import spock.lang.Ignore
 import spock.lang.Specification
 import spock.mock.DetachedMockFactory
-import com.zions.pipeline.services.blueprint.SecurityConfig
 import com.zions.pipeline.services.blueprint.BlueprintRepoService
 import com.zions.pipeline.services.blueprint.db.BlueprintRepo
 import com.zions.pipeline.services.blueprint.model.*
@@ -41,7 +40,7 @@ import spock.lang.Ignore
 import groovy.json.JsonSlurper
 
 
-@ContextConfiguration(classes=[BlueprintRequestControlConfig, SecurityConfig])
+@ContextConfiguration(classes=[BlueprintRequestControlConfig])
 class BlueprintRequestControllerSpec extends Specification {
 	@SpringBean
 	BlueprintRepoService blueprintRepoService = Stub()
