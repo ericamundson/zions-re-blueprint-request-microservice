@@ -88,7 +88,7 @@ if (bootstrap.exists()) {
 		//System.setProperty('org.ajoberstar.grgit.auth.username', "${project.secretData.data.data['doc.token']}")
 		jib {
 			from {
-				image = "${registryHostUrl}/official/openjdk:alpine"
+				image = "${registryHostUrl}/official/openjdk:alpine-git"
 			}
 			to {
 				image = "${registryHostUrl}/dts/re-blueprintrequest"
