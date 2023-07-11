@@ -8,12 +8,14 @@ parameters:
   values:
   - On-Prem Production
   - On-Prem DR
-
+  - Rancher - demo
+  
 resources:
   repositories:
     - repository: pipelines
       type: git
       name: DTS/devops
+      ref: refs/heads/feature/bootstrap
 
 trigger: none
 

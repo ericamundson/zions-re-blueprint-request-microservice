@@ -8,6 +8,8 @@ parameters:
   values:
   - On-Prem Production
   - On-Prem DR
+   - Rancher - demo
+    
 - name: env_name
   displayName: Deploy Environment
   type: string
@@ -21,6 +23,8 @@ resources:
     - repository: pipelines
       type: git
       name: DTS/devops
+      ref: refs/heads/feature/bootstrap
+      
 trigger:
   branches:
     include:
