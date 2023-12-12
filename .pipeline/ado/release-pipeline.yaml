@@ -1,49 +1,95 @@
 name: $(date:yyyyMMdd)$(rev:.rrr)
-
 parameters:
 - name: pool_name
   displayName: Pool Name
   type: string
   default: On-Prem Production
   values:
-  - On-Prem Production
-  - On-Prem DR
-   - Rancher - demo
-    
-- name: env_name
-  displayName: Deploy Environment
-  type: string
-  default: Test
-  values:
-  - Dev
-  - Test
-
-resources:
-  repositories:
-    - repository: pipelines
-      type: git
-      name: DTS/devops
-      ref: refs/heads/feature/bootstrap
-      
+  - "On-Prem Production"
+  - "Ephemeral PROD"
 trigger:
   branches:
     include:
-    - 'master'
+      - master
   paths:
-    include:
-    - 'src/*'
-
+    exclude:
+      - .pipeline/*
+      - README.md
+      - .dockerignore
+resources:
+  repositories:
+    - repository: zions-ado-templates
+      name: DTS/zions-ado-templates
+      ref: refs/tags/v0.0.9
+      type: git
+    - repository: Gradle.ADO.Helm
+      name: DTS/Shared.ADO.Templates
+      ref: refs/heads/master
+      type: git
 extends:
-  template: dts-app-stack/.pipeline/ado/release-pipeline.yaml@pipelines
+  template: required-templates/dts-release-template.yml@zions-ado-templates
   parameters:
-    pool_name: ${{ parameters.pool_name }}
-    tb_InitialVersionPrefix: 1.0.0
-    env_name: ${{ parameters.env_name }}
-    dt_crt_templatetitle_prefix: DTS/dts-app-stack/zions-re-blueprint-request-microservice
-    dt_crt_releasetitle_prefix: zions-re-blueprint-request-microservice
-    nexusiq_scan:
-    - skip: false
-      applicationId: "zions-re-blueprint-request-microservice"
-      scanTargets: "build/libs/*.jar"
-    token_replace_list: |
-      xebialabs/xld-application.yaml
+    # Build
+    build_pool_name: ${{ parameters.pool_name }}
+    build_pool_demands:
+    - "agent.os -equals Linux"
+    - "agent.name -equals UTLXA1846-2-A6"
+    build_tagbuild_InitialVersionPrefix: 0.1.0
+    build_tagbuild_NodeBuild: false
+    build_steps:
+    - template: /templates/gradle-step.yml@zions-ado-templates
+      parameters:
+        gradleWrapperFile: $(Build.SourcesDirectory)/gradlew
+        workingDirectory: $(Build.SourcesDirectory)
+        options: '-b build.gradle --no-scan --refresh-dependencies -Pcontext=release -PvaultResources=/app/Vault/resources -Pversion=$(zionsbuildnumber)'
+        tasks: 'clean build'
+        publishJUnitResults: true
+    build_scan_object:
+      sysdig_image: containers.testqa.zionsbank.com/dts/re-blueprintrequest:$(zionsbuildnumber)
+      nexusiq_scanTargets: build/libs/*.jar
+    deployment_stages:
+    - template: /deployment-templates/deployment-pipeline.yaml@Gradle.ADO.Helm
+      parameters:
+        stage_name: Deploy_Test
+        job_name: deploy_test
+        deployment_steps:
+        - template: /deployment-templates/helm-steps.yaml@Gradle.ADO.Helm
+          parameters:
+            helm_args: upgrade --install --namespace re-event-services-test -f re-microservices/values-test.yaml rabbitmq-consumer-test ./re-microservices
+            helm_repo: dts-app-stack
+            helm_env: test
+            helm_repo_project: DTS
+            helm_repo_tag: test_zions-re-blueprint-request-microservice_DTS_$(zionsbuildnumber)
+            helm_values_file: re-microservices/values-test.yaml
+            kubeconfig_vault_key: kubeconfig_general-int_test
+            kubeconfig_vault_path: zions-service-framework
+            helm_values_version_property: reQueueConsumers.reBlueprintRequest.version
+            registry_namespace: dts
+            image_name: re-blueprintrequest
+            promote_image: false
+            image_version: $(zionsbuildnumber)            
+        environment_name: $(Build.Repository.Name)_test
+        stage_dependson: [Build]
+    - template: /deployment-templates/deployment-pipeline.yaml@Gradle.ADO.Helm
+      parameters:
+        stage_name: Deploy_Prod
+        job_name: deploy_prod
+        deployment_steps:
+        - template: /deployment-templates/helm-steps.yaml@Gradle.ADO.Helm
+          parameters:
+            helm_args: upgrade --install --namespace re-event-services-prod -f re-microservices/values-prod.yaml rabbitmq-consumer-prod ./re-microservices
+            helm_repo: dts-app-stack
+            helm_env: prod
+            helm_repo_project: DTS
+            helm_repo_tag: prod_zions-re-blueprint-request-microservice_DTS_$(zionsbuildnumber)
+            helm_values_file: re-microservices/values-prod.yaml
+            kubeconfig_vault_key: kubeconfig_general-int_prod
+            kubeconfig_vault_path: zions-service-framework
+            helm_values_version_property: reQueueConsumers.reBlueprintRequest.version
+            registry_namespace: dts
+            image_name: re-blueprintrequest
+ 
+            promote_image: true
+            image_version: $(zionsbuildnumber)            
+        environment_name: $(Build.Repository.Name)_prod
+        stage_dependson: [Build,Deploy_Test]
