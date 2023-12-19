@@ -3,10 +3,14 @@ parameters:
 - name: pool_name
   displayName: Pool Name
   type: string
-  default: On-Prem Production
+  default: Ephemeral PROD
   values:
   - "On-Prem Production"
   - "Ephemeral PROD"
+  - "Ephemeral STAGE"
+  - "Ephemeral TESTQA"
+  - "Ephemeral DEBUG_P"
+  - "Ephemeral DEBUG_T"
 trigger:
   branches:
     include:
@@ -20,7 +24,7 @@ resources:
   repositories:
     - repository: zions-ado-templates
       name: DTS/zions-ado-templates
-      ref: refs/tags/v0.0.9
+      ref: refs/tags/v0.0.13
       type: git
     - repository: Gradle.ADO.Helm
       name: DTS/Shared.ADO.Templates
@@ -33,7 +37,6 @@ extends:
     build_pool_name: ${{ parameters.pool_name }}
     build_pool_demands:
     - "agent.os -equals Linux"
-    - "agent.name -equals UTLXA1846-2-A6"
     build_tagbuild_InitialVersionPrefix: 0.1.0
     build_tagbuild_NodeBuild: false
     build_steps:
@@ -47,12 +50,17 @@ extends:
     build_scan_object:
       sysdig_image: containers.testqa.zionsbank.com/dts/re-blueprintrequest:$(zionsbuildnumber)
       nexusiq_scanTargets: build/libs/*.jar
+      nexusiq_organizationId: bc29079689124c8bbef346a3d149e714
     deployment_stages:
     - template: /deployment-templates/deployment-pipeline.yaml@Gradle.ADO.Helm
       parameters:
+        pool_name: ${{ parameters.pool_name }}
         stage_name: Deploy_Test
         job_name: deploy_test
         deployment_steps:
+        - ${{ if ne(parameters.pool_name, 'On-Prem Production') }}:
+          - template: /templates/install-helm-step.yml@zions-ado-templates
+          - template: /templates/install-skopeo-step.yml@Gradle.ADO.Helm
         - template: /deployment-templates/helm-steps.yaml@Gradle.ADO.Helm
           parameters:
             helm_args: upgrade --install --namespace re-event-services-test -f re-microservices/values-test.yaml rabbitmq-consumer-test ./re-microservices
@@ -72,9 +80,13 @@ extends:
         stage_dependson: [Build]
     - template: /deployment-templates/deployment-pipeline.yaml@Gradle.ADO.Helm
       parameters:
+        pool_name: ${{ parameters.pool_name }}
         stage_name: Deploy_Prod
         job_name: deploy_prod
         deployment_steps:
+        - ${{ if ne(parameters.pool_name, 'On-Prem Production') }}:
+          - template: /templates/install-helm-step.yml@zions-ado-templates
+          - template: /templates/install-skopeo-step.yml@Gradle.ADO.Helm
         - template: /deployment-templates/helm-steps.yaml@Gradle.ADO.Helm
           parameters:
             helm_args: upgrade --install --namespace re-event-services-prod -f re-microservices/values-prod.yaml rabbitmq-consumer-prod ./re-microservices

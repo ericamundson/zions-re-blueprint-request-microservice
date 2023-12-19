@@ -3,16 +3,20 @@ parameters:
 - name: pool_name
   displayName: Pool Name
   type: string
-  default: On-Prem Production
+  default: Ephemeral PROD
   values:
   - "On-Prem Production"
   - "Ephemeral PROD"
+  - "Ephemeral STAGE"
+  - "Ephemeral TESTQA"
+  - "Ephemeral DEBUG_P"
+  - "Ephemeral DEBUG_T"
 trigger: none
 resources:
   repositories:
     - repository: zions-ado-templates
       name: DTS/zions-ado-templates
-      ref: refs/tags/v0.0.9
+      ref: refs/tags/v0.0.13
       type: git
 extends:
   template: required-templates/dts-ci-template.yml@zions-ado-templates
@@ -21,7 +25,6 @@ extends:
     build_pool_name: ${{ parameters.pool_name }}
     build_pool_demands:
     - "agent.os -equals Linux"
-    - "agent.name -equals UTLXA1846-2-A6"
     build_steps:
     - template: /templates/gradle-step.yml@zions-ado-templates
       parameters:
