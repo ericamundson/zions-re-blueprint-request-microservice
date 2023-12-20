@@ -206,6 +206,7 @@ dependencies {
 	
 	compile 'org.springframework.boot:spring-boot-starter-web'
 	//compile 'org.springframework.boot:spring-boot-starter-security'
+	compile 'com.zions.dts.services:zions-boot:latest.release'
 
 	//component specific
 	if (context && context == 'release') {
