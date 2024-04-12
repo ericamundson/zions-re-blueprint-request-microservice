@@ -30,10 +30,11 @@ import com.zions.vsts.services.rmq.mixins.MessageFanoutConfigTrait
 import com.zions.vsts.services.tfs.rest.MultiUserGenericRestClient
 import com.zions.pipeline.services.feedback.LogCallbackHandler
 import com.zions.pipeline.services.yaml.template.RemoteBlueprintTemplateInterpretorService
+import com.zions.pipeline.services.blueprint.utils.ChartRunner
 import com.zions.vsts.services.tfs.rest.IFailureHandler
 
 @Configuration
-@ComponentScan(["com.zions.pipeline.services", "com.zions.vsts.services", "com.zions.common.services.notification", "com.zions.common.services.slf4j", "com.zions.xlr.services"])
+@ComponentScan(["com.zions.pipeline.services", "com.zions.vsts.services", "com.zions.common.services.notification", "com.zions.common.services.slf4j", "com.zions.xlr.services", "com.zions.nexus.services"])
 @EnableMongoRepositories(basePackages = ["com.zions.pipeline.services.db","com.zions.pipeline.services.blueprint.db"])
 //@Profile('dev')
 public class AppConfig  {
@@ -77,6 +78,12 @@ public class AppConfig  {
 	@Bean
 	IGenericRestClient mrGenericRestClient() {
 		return new MrGenericRestClient('', '')
+	}
+	
+	@Bean
+	@Scope('prototype')
+	ChartRunner chartRunner() {
+		return new ChartRunner()
 	}
 
 	@Bean
