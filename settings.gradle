@@ -3,6 +3,8 @@ if (!context || context != 'release') {
 	File settingDir = new File('./')
 	include ':zions-pipeline-services'
 	project(':zions-pipeline-services').projectDir = new File(settingDir, '../zions-pipeline-services')
+	include ':zions-nexusiq-services'
+	project(':zions-nexusiq-services').projectDir = new File(settingDir, '../zions-nexusiq-services')
 	include ':zions-xlr-services'
 	project(':zions-xlr-services').projectDir = new File(settingDir, '../zions-xlr-services')
 	include ':zions-xld-services'

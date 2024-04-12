@@ -1,0 +1,30 @@
+{
+	"chartName": "ADO.Build.Deploy",
+	"chartDescription": "o Utilizes flexible build task, including:\n  o Gradle\n  o Maven\no Sets up ADO deployments per pipeline environments: Dev, Test, Stage, Prod \n  - Environments can be set through value settings.  E.G. name, approvers\n  - Deployments are defined through value array.\no Deployment job steps are geared toward specifiying a template for deploy steps. \n  - Helm Orchestration.\n  - Helm simple.\n  - XebiaLabs Deploy\n",
+	"chartVersion": "0.0.33",
+	"valuesName": "Release Engineering Micro-service Chart Apply.",
+	"valuesDescription": "These chart values provide means to generate CI/CD ADO pipelines for Release Engineering \nmicro-service.  The pipeline will be pure ADO with Helm tasks for environment deployments.\nAll Release Engineering deployments run out of a single Helm chart, dts-app-stack.",
+	"valuesFileName": "values-re-ms.yaml",
+	"valueOverrideSettings": [
+		{
+			"key": "environments.prod.isCDChangeManagement",
+			"description": null,
+			"value": "false"
+		},
+		{
+			"key": "deploy.valuesVersionProperty",
+			"description": null,
+			"value": "reQueueConsumers.reIssueNotification.version"
+		},
+		{
+			"key": "deploy.imageName",
+			"description": null,
+			"value": "re-issue-notification"
+		},
+		{
+			"key": "build_scan_object.sysdig_image",
+			"description": null,
+			"value": "containers.testqa.zionsbank.com/dts/re-issue-notification:$(zionsbuildnumber)"
+		}
+	]
+}
