@@ -1,23 +1,35 @@
 name: $(date:yyyyMMdd)$(rev:.rrr)
-
 parameters:
 - name: pool_name
   displayName: Pool Name
   type: string
-  default: On-Prem Production
+  default: Ephemeral PROD
   values:
-  - On-Prem Production
-  - On-Prem DR
-
+  - "On-Prem Production"
+  - "Ephemeral PROD"
+  - "Ephemeral STAGE"
+  - "Ephemeral TESTQA"
+  - "Ephemeral DEBUG_P"
+  - "Ephemeral DEBUG_T"
+trigger: none
 resources:
   repositories:
-    - repository: pipelines
+    - repository: zions-ado-templates
+      name: DTS/zions-ado-templates
+      ref: refs/tags/v0.0.13
       type: git
-      name: DTS/devops
-
-trigger: none
-
 extends:
-  template: dts-app-stack/.pipeline/ado/ci-pipeline.yaml@pipelines
+  template: required-templates/dts-ci-template.yml@zions-ado-templates
   parameters:
-    pool_name: ${{ parameters.pool_name }}
+    # Build
+    build_pool_name: ${{ parameters.pool_name }}
+    build_pool_demands:
+    - "agent.os -equals Linux"
+    build_steps:
+    - template: /templates/gradle-step.yml@zions-ado-templates
+      parameters:
+        gradleWrapperFile: $(Build.SourcesDirectory)/gradlew
+        workingDirectory: $(Build.SourcesDirectory)
+        options: '-b build.gradle --no-scan --refresh-dependencies -x jib -Pcontext=release -PvaultResources=/app/Vault/resources'
+        tasks: 'clean build'
+        publishJUnitResults: true

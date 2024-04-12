@@ -29,6 +29,7 @@ buildscript {
 		classpath "gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:3.0.0"
 		classpath 'gradle.plugin.io.errorlab.gradle.vault:vault:0.1.0'
 		classpath 'com.github.qwazer:markdown-confluence-gradle-plugin:0.9.2'
+		classpath 'com.zions.dts.services:zions-boot:latest.release'
 	}
 }
 
@@ -42,11 +43,18 @@ apply plugin: 'com.google.cloud.tools.jib'
 //	apply plugin: 'mdplantuml'
 apply plugin: 'com.github.qwazer.markdown-confluence'
 
-File bootstrap = new File("${vaultResources}/bootstrap.properties")
-if (bootstrap.exists()) {
+//File bootstrap = new File("${vaultResources}/bootstrap.properties")
+//if (bootstrap.exists()) {
+//	apply plugin: 'io.errorlab.gradle.vault'
+//	Properties props = new Properties()
+//	props.load(new FileInputStream("${vaultResources}/bootstrap.properties"))
+
+InputStream istream = this.getClass().getResourceAsStream('/bootstrap.properties')
+if (istream != null) {
 	apply plugin: 'io.errorlab.gradle.vault'
 	Properties props = new Properties()
-	props.load(new FileInputStream("${vaultResources}/bootstrap.properties"))
+	props.load(istream)
+
 	props.each { prop ->
 		project.ext.set(prop.key, prop.value)
 	}
@@ -88,7 +96,7 @@ if (bootstrap.exists()) {
 		//System.setProperty('org.ajoberstar.grgit.auth.username', "${project.secretData.data.data['doc.token']}")
 		jib {
 			from {
-				image = "${registryHostUrl}/official/openjdk:alpine"
+				image = "${registryHostUrl}/official/openjdk:alpine-git"
 			}
 			to {
 				image = "${registryHostUrl}/dts/re-blueprintrequest"
@@ -124,10 +132,10 @@ if (bootstrap.exists()) {
 
 ext['groovy.version'] = '3.0.1'
 
-sourceSets.main.resources {
+//sourceSets.main.resources {
 	//srcDir '../zions-pipeline-services/src/main/resources'
-	srcDir "${vaultResources}"
-}
+//	srcDir "${vaultResources}"
+//}
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -198,6 +206,7 @@ dependencies {
 	
 	compile 'org.springframework.boot:spring-boot-starter-web'
 	//compile 'org.springframework.boot:spring-boot-starter-security'
+	compile 'com.zions.dts.services:zions-boot:latest.release'
 
 	//component specific
 	if (context && context == 'release') {
@@ -274,10 +283,10 @@ allprojects {
 
 	ext['groovy.version'] = '3.0.1'
 
-	sourceSets.main.resources {
+//	sourceSets.main.resources {
 		//srcDir '../common/groovydoc'
-		srcDir "${vaultResources}"
-	}
+//		srcDir "${vaultResources}"
+//	}
 
 
 
