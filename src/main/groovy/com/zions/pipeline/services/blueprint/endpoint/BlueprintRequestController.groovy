@@ -147,6 +147,12 @@ class BlueprintRequestController {
 					}
 				}
 			}
+			if (valuesData.applyChartArguments.size() > 0) {
+				vals.'interface'.applyArgs = []
+				for (def arg in valuesData.applyChartArguments) {
+					vals.'interface'.applyArgs.add([key: arg.key, value: arg.value])
+				}
+			}
 			def yb = new YamlBuilder()
 			yb(vals)
 			
@@ -236,9 +242,45 @@ class BlueprintRequestController {
 							setting.key = overrideValue.key
 							if (overrideValue.description) {
 								setting.description = overrideValue.description								
+							} else {
+								setting.description = 'Tip is coming'
+							}
+							if (overrideValue.label) {
+								setting.label = overrideValue.label
+							} else {
+								setting.label = setting.key
+							}
+							if (overrideValue.validationRegex) {
+								setting.validationRegex = overrideValue.validationRegex
+							} else {
+								setting.validationRegex = '[^]*'
 							}
 							setting.value = overrideValue.'value'
 							cvd.valueOverrideSettings.add(setting)
+						}
+					}
+					if (valuesYaml.'interface'.applyArgs && valuesYaml.'interface'.applyArgs.size() > 0) {
+						cvd.applyChartArguments = []
+						for (def arg in valuesYaml.'interface'.applyArgs) {
+							ApplyChartArgument applyArg = new ApplyChartArgument()
+							applyArg.key = arg.key
+							if (arg.description) {
+								applyArg.description = arg.description
+							} else {
+								applyArg.description = 'Tip is coming'
+							}
+							if (arg.label) {
+								applyArg.label = arg.label
+							} else {
+								applyArg.label = arg.key
+							}
+							if (arg.validationRegex) {
+								applyArg.validationRegex = arg.validationRegex
+							} else {
+								applyArg.validationRegex = '[^]*'
+							}
+							applyArg.value = arg.'value'
+							cvd.applyChartArguments.add(applyArg)
 						}
 					}
 					valuesDataList.add(cvd)
@@ -258,7 +300,7 @@ class BlueprintRequestController {
 		def result = reGenericRestClient.post(
 			requestContentType: ContentType.JSON,
 			contentType: ContentType.JSON,
-			uri:  "${reGenericRestClient.reUrl}/api/pipelinecli/action",
+			uri:  "${reGenericRestClient.reUrl}/pipelinecli/action",
 			//header: ['content-type': 'application/json'],
 			body: body
 		)

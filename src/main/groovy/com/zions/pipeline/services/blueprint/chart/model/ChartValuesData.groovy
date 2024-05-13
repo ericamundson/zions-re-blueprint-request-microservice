@@ -15,6 +15,7 @@ class ChartValuesData {
 	String repoUrl
 	
 	List<ValueOverrideSetting> valueOverrideSettings
+	List<ApplyChartArgument> applyChartArguments
 	
 	
 }
