@@ -4,4 +4,6 @@ class ValueOverrideSetting {
 	String key
 	String description
 	String value
+	String validationRegex
+	String label
 }
