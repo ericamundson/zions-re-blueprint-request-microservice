@@ -23,6 +23,9 @@ import groovy.util.logging.Slf4j
 import groovy.io.FileType
 import groovyx.net.http.ContentType
 import org.springframework.http.HttpStatus
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import static com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature.LITERAL_BLOCK_STYLE
 
 
 @CrossOrigin
@@ -154,12 +157,14 @@ class BlueprintRequestController {
 				}
 			}
 			def yb = new YamlBuilder()
+		
 			yb(vals)
-			
-			String valsYaml = yb.toString()
+		
+			String valsYaml = new ObjectMapper(new YAMLFactory().configure(LITERAL_BLOCK_STYLE, true)).writeValueAsString(yb.content)
+
 			def result = runCLIApplyChart(valsYaml, valuesData.chartName, valuesData.repoUrl, valuesData.valuesFileName)
 
-			if (result.exitValue != 0) {
+			if (result || result.exitValue != 0) {
 				return new ResponseEntity<String>(result.logs, HttpStatus.EXPECTATION_FAILED)
 				
 			} else {
@@ -255,6 +260,11 @@ class BlueprintRequestController {
 							} else {
 								setting.validationRegex = '[^]*'
 							}
+							if (overrideValue.valueOptions) {
+								setting.valueOptions = overrideValue.valueOptions as String[]
+							} else {
+								setting.valueOptions = []
+							}
 							setting.value = overrideValue.'value'
 							cvd.valueOverrideSettings.add(setting)
 						}
@@ -278,6 +288,11 @@ class BlueprintRequestController {
 								applyArg.validationRegex = arg.validationRegex
 							} else {
 								applyArg.validationRegex = '[^]*'
+							}
+							if (arg.valueOptions) {
+								applyArg.valueOptions = arg.valueOptions as String[]
+							} else {
+								applyArg.valueOptions = []
 							}
 							applyArg.value = arg.'value'
 							cvd.applyChartArguments.add(applyArg)

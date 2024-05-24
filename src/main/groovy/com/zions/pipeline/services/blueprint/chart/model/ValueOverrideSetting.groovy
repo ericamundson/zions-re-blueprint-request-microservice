@@ -6,4 +6,5 @@ class ValueOverrideSetting {
 	String value
 	String validationRegex
 	String label
+	List<String> valueOptions
 }

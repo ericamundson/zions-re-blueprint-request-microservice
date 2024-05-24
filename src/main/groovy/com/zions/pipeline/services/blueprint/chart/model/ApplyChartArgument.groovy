@@ -6,4 +6,5 @@ class ApplyChartArgument {
 	String validationRegex
 	String label
 	String value
+	List<String> valueOptions
 }
