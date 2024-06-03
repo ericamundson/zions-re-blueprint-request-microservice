@@ -24,8 +24,14 @@ import groovy.io.FileType
 import groovyx.net.http.ContentType
 import org.springframework.http.HttpStatus
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature
+import com.zions.pipeline.services.blueprint.utils.ProtocolConvert
 import static com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature.LITERAL_BLOCK_STYLE
+import static com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature.USE_PLATFORM_LINE_BREAKS
+import static com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature.SPLIT_LINES
+import static com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature.MINIMIZE_QUOTES
 
 
 @CrossOrigin
@@ -55,6 +61,9 @@ class BlueprintRequestController {
 	@Autowired
 	SearchService searchService
 	
+	@Autowired
+	ProtocolConvert protocolConvert
+
 	@Autowired
 	RepositoryService repositoryService
 	
@@ -134,7 +143,7 @@ class BlueprintRequestController {
 		if (vFile.exists()) {
 			String outStr = vFile.text
 			outStr = outStr.replaceAll(/(#)( |\S)*$/, '')
-			def vals = [:]
+			HashMap<String, Object> vals = [:]
 			try {
 				vals = new YamlSlurper().parseText(outStr)
 			} catch (e) {
@@ -142,6 +151,7 @@ class BlueprintRequestController {
 				//log.error(e.message )
 			}
 			List<String> oVals = []
+			String overrideValsStr = null
 			if (vals.'interface' && vals.'interface'.overrideValues && vals.'interface'.overrideValues.size() > 0) {
 				if (valuesData.valueOverrideSettings.size() > 0) {
 					vals.'interface'.overrideValues = []
@@ -149,22 +159,35 @@ class BlueprintRequestController {
 						vals.'interface'.overrideValues.add([key: ov.key, value: ov.value])
 					}
 				}
+				overrideValsStr = "overrideValues:\n" + new ObjectMapper(new YAMLFactory().configure(Feature.WRITE_DOC_START_MARKER, false).configure(LITERAL_BLOCK_STYLE, true)).writeValueAsString(vals.'interface'.overrideValues)
 			}
+			String applyArgsStr = null
 			if (valuesData.applyChartArguments.size() > 0) {
 				vals.'interface'.applyArgs = []
 				for (def arg in valuesData.applyChartArguments) {
 					vals.'interface'.applyArgs.add([key: arg.key, value: arg.value])
 				}
+				applyArgsStr = "applyArgs:\n" + new ObjectMapper(new YAMLFactory().configure(Feature.WRITE_DOC_START_MARKER, false).configure(LITERAL_BLOCK_STYLE, true)).writeValueAsString(vals.'interface'.applyArgs)
 			}
-			def yb = new YamlBuilder()
+			
+			if (outStr.contains('applyArgs:')) {
+				outStr = outStr.substring(0,outStr.indexOf('applyArgs:'))
+			}
+			if (applyArgsStr) {
+				outStr = outStr + '\n' + protocolConvert.indentString(applyArgsStr, 2)
+			}
+			if (overrideValsStr) {
+				outStr = outStr + '\n' + protocolConvert.indentString(overrideValsStr, 2)
+			}
+//			def yb = new YamlBuilder()
+//		
+//			yb(vals)
+			
 		
-			yb(vals)
-		
-			String valsYaml = new ObjectMapper(new YAMLFactory().configure(LITERAL_BLOCK_STYLE, true)).writeValueAsString(yb.content)
+			
+			def result = runCLIApplyChart(outStr, valuesData.chartName, valuesData.repoUrl, valuesData.valuesFileName)
 
-			def result = runCLIApplyChart(valsYaml, valuesData.chartName, valuesData.repoUrl, valuesData.valuesFileName)
-
-			if (result || result.exitValue != 0) {
+			if (!result || result.exitValue != 0) {
 				return new ResponseEntity<String>(result.logs, HttpStatus.EXPECTATION_FAILED)
 				
 			} else {
@@ -348,6 +371,36 @@ class BlueprintRequestController {
 		AntBuilder ant = new AntBuilder()
 		ant.untar( src: "${cFileZip.absoluteFile}", compression: 'gzip', dest: "${cOutDir.absolutePath}")
 		return cOutDir
+	}
+	
+	String setValue(String inValues, String property, String value) {
+		String[] propertyParts = property.split("\\.")
+		int pSize = propertyParts.size()
+		String outStr = inValues
+		int c = 0
+		int propIndex = -1
+		String trimString = outStr
+		int outIndex = 0
+		for (String part in propertyParts) {
+			String partC = "${part}:"
+			if (trimString.indexOf(partC) == -1) {
+				throw new Exception("Property ${property} was not found!")
+			} else {
+				propIndex = trimString.indexOf(partC)
+				trimString = trimString.substring(propIndex)
+				outIndex += propIndex
+			}
+			c++
+		}
+		String sep = System.getProperty("line.separator")
+		def pattern = ~/\w+:[ |\S]*(\n|\r\n)/
+					
+		trimString = trimString.replaceFirst(pattern) {
+			"${propertyParts[pSize-1]}: ${value}${sep}"
+		}
+		String fullOut = outStr.substring(0, outIndex) + trimString
+		return fullOut
+
 	}
 	
 	
