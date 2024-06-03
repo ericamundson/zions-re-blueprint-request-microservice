@@ -1,11 +1,12 @@
 name: $(date:yyyyMMdd)$(rev:.rrr)
+variables:
+- group: "Release Engineering - secrets"
 parameters:
 - name: pool_name
   displayName: Pool Name
   type: string
   default: Ephemeral PROD
   values:
-  - "On-Prem Production"
   - "Ephemeral PROD"
   - "Ephemeral STAGE"
   - "Ephemeral TESTQA"
@@ -14,55 +15,57 @@ parameters:
 trigger:
   branches:
     include:
-      - master
+    - "master"
   paths:
     exclude:
-      - .pipeline/*
-      - README.md
-      - .dockerignore
+    - ".pipeline/*"
+    - "README.md"
+    - ".dockerignore"
 resources:
   repositories:
-    - repository: zions-ado-templates
-      name: DTS/zions-ado-templates
-      ref: refs/tags/v0.0.13
-      type: git
-    - repository: Gradle.ADO.Helm
-      name: DTS/Shared.ADO.Templates
-      ref: refs/heads/master
-      type: git
+  - repository: zions-ado-templates
+    name: DTS/zions-ado-templates
+    ref: refs/tags/v0.4.4
+    type: git
 extends:
-  template: required-templates/dts-release-template.yml@zions-ado-templates
+  template: /required-templates/dts-release-template.yaml@zions-ado-templates
   parameters:
     # Build
     build_pool_name: ${{ parameters.pool_name }}
     build_pool_demands:
     - "agent.os -equals Linux"
-    build_tagbuild_InitialVersionPrefix: 0.1.0
+    build_tagbuild_InitialVersionPrefix: 0.0.1
     build_tagbuild_NodeBuild: false
+   
     build_steps:
-    - template: /templates/gradle-step.yml@zions-ado-templates
+    - template: /templates/step/build/gradle.yaml@zions-ado-templates
       parameters:
         gradleWrapperFile: $(Build.SourcesDirectory)/gradlew
         workingDirectory: $(Build.SourcesDirectory)
         options: '-b build.gradle --no-scan --refresh-dependencies -Pcontext=release -PvaultResources=/app/Vault/resources -Pversion=$(zionsbuildnumber)'
         tasks: 'clean build'
-        publishJUnitResults: true
-    build_scan_object:
-      sysdig_image: containers.testqa.zionsbank.com/dts/re-blueprintrequest:$(zionsbuildnumber)
-      nexusiq_scanTargets: build/libs/*.jar
-      nexusiq_organizationId: bc29079689124c8bbef346a3d149e714
+        publishJUnitResults: true   
+    
+    build_scan_object: 
+      nexusiq_scanTargets: "build/libs/*.jar"
+      nexusiq_organizationId: "bc29079689124c8bbef346a3d149e714"
+      sysdig_image: "containers.testqa.zionsbank.com/dts/re-blueprintrequest:$(zionsbuildnumber)"
     deployment_stages:
-    - template: /deployment-templates/deployment-pipeline.yaml@Gradle.ADO.Helm
+    - template: /templates/stage/dts-deployment.yaml@zions-ado-templates
       parameters:
         pool_name: ${{ parameters.pool_name }}
         stage_name: Deploy_Test
         job_name: deploy_test
         deployment_steps:
-        - ${{ if ne(parameters.pool_name, 'On-Prem Production') }}:
-          - template: /templates/install-helm-step.yml@zions-ado-templates
-          - template: /templates/install-skopeo-step.yml@Gradle.ADO.Helm
-        - template: /deployment-templates/helm-steps.yaml@Gradle.ADO.Helm
+        - ${{ if contains(lower(parameters.pool_name), 'ephemeral') }}:
+          - template: /templates/step/install-tools.yaml@zions-ado-templates
+            parameters:
+              tools:
+              - name: helm
+              - name: skopeo
+        - template: /templates/step/deploy/helm.yaml@zions-ado-templates
           parameters:
+            cli_profile: default
             helm_args: upgrade --install --namespace re-event-services-test -f re-microservices/values-test.yaml rabbitmq-consumer-test ./re-microservices
             helm_repo: dts-app-stack
             helm_env: test
@@ -76,19 +79,23 @@ extends:
             image_name: re-blueprintrequest
             promote_image: false
             image_version: $(zionsbuildnumber)            
-        environment_name: $(Build.Repository.Name)_test
+        environment_name: zions-re-blueprint-request-microservice_test
         stage_dependson: [Build]
-    - template: /deployment-templates/deployment-pipeline.yaml@Gradle.ADO.Helm
+    - template: /templates/stage/dts-deployment.yaml@zions-ado-templates
       parameters:
         pool_name: ${{ parameters.pool_name }}
         stage_name: Deploy_Prod
         job_name: deploy_prod
         deployment_steps:
-        - ${{ if ne(parameters.pool_name, 'On-Prem Production') }}:
-          - template: /templates/install-helm-step.yml@zions-ado-templates
-          - template: /templates/install-skopeo-step.yml@Gradle.ADO.Helm
-        - template: /deployment-templates/helm-steps.yaml@Gradle.ADO.Helm
+        - ${{ if contains(lower(parameters.pool_name), 'ephemeral') }}:
+          - template: /templates/step/install-tools.yaml@zions-ado-templates
+            parameters:
+              tools:
+              - name: helm
+              - name: skopeo
+        - template: /templates/step/deploy/helm.yaml@zions-ado-templates
           parameters:
+            cli_profile: default
             helm_args: upgrade --install --namespace re-event-services-prod -f re-microservices/values-prod.yaml rabbitmq-consumer-prod ./re-microservices
             helm_repo: dts-app-stack
             helm_env: prod
@@ -100,8 +107,8 @@ extends:
             helm_values_version_property: reQueueConsumers.reBlueprintRequest.version
             registry_namespace: dts
             image_name: re-blueprintrequest
- 
+         
             promote_image: true
             image_version: $(zionsbuildnumber)            
-        environment_name: $(Build.Repository.Name)_prod
+        environment_name: zions-re-blueprint-request-microservice_prod
         stage_dependson: [Build,Deploy_Test]
