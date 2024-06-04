@@ -173,6 +173,9 @@ class BlueprintRequestController {
 			if (outStr.contains('applyArgs:')) {
 				outStr = outStr.substring(0,outStr.indexOf('applyArgs:'))
 			}
+			if (outStr.contains('overrideValues:')) {
+				outStr = outStr.substring(0,outStr.indexOf('overrideValues:'))
+			}
 			if (applyArgsStr) {
 				outStr = outStr + '\n' + protocolConvert.indentString(applyArgsStr, 2)
 			}
