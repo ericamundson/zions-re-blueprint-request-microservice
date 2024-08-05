@@ -262,7 +262,7 @@ class BlueprintRequestController {
 					cvd.chartName = chartName
 					cvd.chartVersion = chartVersion
 					cvd.editApplyArguments = true
-					if (valuesYaml.'interface'.editApplyArguments) {
+					if (valuesYaml.'interface'.editApplyArguments != null && valuesYaml.'interface'.editApplyArguments == false) {
 						cvd.editApplyArguments = valuesYaml.'interface'.editApplyArguments as Boolean
 					}
 					cvd.valuesFileName = t.absolutePath.substring(oDir.absolutePath.length()+1)
