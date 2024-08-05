@@ -261,6 +261,10 @@ class BlueprintRequestController {
 					cvd.chartDescription = chartDescription
 					cvd.chartName = chartName
 					cvd.chartVersion = chartVersion
+					cvd.editApplyArguments = true
+					if (valuesYaml.'interface'.editApplyArguments) {
+						cvd.editApplyArguments = valuesYaml.'interface'.editApplyArguments as Boolean
+					}
 					cvd.valuesFileName = t.absolutePath.substring(oDir.absolutePath.length()+1)
 					cvd.valuesName = valuesYaml.'interface'.name
 					if (valuesYaml.'interface'.description) {
@@ -285,6 +289,16 @@ class BlueprintRequestController {
 								setting.validationRegex = overrideValue.validationRegex
 							} else {
 								setting.validationRegex = '[^]*'
+							}
+							if (overrideValue.promptIf) {
+								setting.promptIf = overrideValue.promptIf
+							} else {
+								setting.promptIf = null
+							}
+							if (overrideValue.valueType) {
+								setting.valueType = overrideValue.valueType
+							} else {
+								setting.valueType = 'string'
 							}
 							if (overrideValue.valueOptions) {
 								setting.valueOptions = overrideValue.valueOptions as String[]

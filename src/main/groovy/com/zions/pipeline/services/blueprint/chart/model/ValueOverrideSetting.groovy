@@ -5,6 +5,8 @@ class ValueOverrideSetting {
 	String description
 	String value
 	String validationRegex
+	String promptIf
+	String valueType
 	String label
 	List<String> valueOptions
 }

@@ -12,6 +12,8 @@ class ChartValuesData {
 	String valuesDescription
 	String valuesFileName
 	
+	Boolean editApplyArguments
+	
 	String repoUrl
 	
 	List<ValueOverrideSetting> valueOverrideSettings
