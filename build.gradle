@@ -153,8 +153,11 @@ dependencies {
 	
 	
 	
-	
 		implementation "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
+		implementation "org.springframework.boot:spring-boot-starter-mail:${springBootVersion}"
+	
+			
+		implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0'
 	
 	
 //
