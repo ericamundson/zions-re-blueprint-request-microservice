@@ -14,8 +14,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl
 import org.spockframework.spring.*
 
 import com.zions.common.services.cache.ICacheManagementService
-import com.mongodb.MongoClient
-import com.mongodb.MongoClientOptions
 import com.zions.common.services.cache.CacheManagementService
 import com.zions.common.services.command.CommandManagementService
 import com.zions.common.services.rest.IGenericRestClient

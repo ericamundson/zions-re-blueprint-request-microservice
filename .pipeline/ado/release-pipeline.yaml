@@ -38,6 +38,11 @@ extends:
     build_tagbuild_NodeBuild: false
    
     build_steps:
+    - template: templates/step/install-tools.yaml@zions-ado-templates
+      parameters:
+        tools:
+        - name: java
+          version: 17
     - template: /templates/step/build/gradle.yaml@zions-ado-templates
       parameters:
         gradleWrapperFile: $(Build.SourcesDirectory)/gradlew

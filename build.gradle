@@ -1,10 +1,13 @@
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-
 buildscript {
 	ext {
-		springBootVersion = '2.2.2.RELEASE'
-		springCloudVersion = 'Greenwich.SR2'
+		springBootVersion = '3.3.2'
+		springCloudVersion = '4.1.3'
+		groovyVersion = '4.0.21'
+		spockVersion = '2.4-M1-groovy-4.0'
+		jdkVersion = '17'
+		repoName = 'zions-re-blueprint-request-microservice'
 	}
 	repositories {
 		if ("${queue}" == 'Hosted') {
@@ -23,38 +26,26 @@ buildscript {
 	}
 	dependencies {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-		//		classpath 'com.zions.gradle:gplantumlPlugin:0.1.6'
-		//		classpath 'net.sourceforge.plantuml:plantuml:8059'
-//		classpath 'org.ajoberstar:gradle-git-publish:2.0.0'
-		classpath "gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:3.0.0"
+		classpath 'org.ajoberstar:gradle-git-publish:2.1.3'
+		classpath 'com.bmuschko:gradle-docker-plugin:6.6.1'
 		classpath 'gradle.plugin.io.errorlab.gradle.vault:vault:0.1.0'
 		classpath 'com.github.qwazer:markdown-confluence-gradle-plugin:0.9.2'
+		classpath "org.springframework.cloud:spring-cloud-dependencies:2023.0.3"
+		classpath "gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:3.0.0"
 		classpath 'com.zions.dts.services:zions-boot:latest.release'
 	}
 }
-
-apply plugin: 'maven'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'groovy'
-apply plugin: 'com.google.cloud.tools.jib'
-//	apply plugin: 'gplantuml'
-//	apply plugin: 'mdplantuml'
 apply plugin: 'com.github.qwazer.markdown-confluence'
-
-//File bootstrap = new File("${vaultResources}/bootstrap.properties")
-//if (bootstrap.exists()) {
-//	apply plugin: 'io.errorlab.gradle.vault'
-//	Properties props = new Properties()
-//	props.load(new FileInputStream("${vaultResources}/bootstrap.properties"))
-
+apply plugin: 'com.google.cloud.tools.jib'
 InputStream istream = this.getClass().getResourceAsStream('/bootstrap.properties')
 if (istream != null) {
 	apply plugin: 'io.errorlab.gradle.vault'
 	Properties props = new Properties()
 	props.load(istream)
-
 	props.each { prop ->
 		project.ext.set(prop.key, prop.value)
 	}
@@ -68,21 +59,6 @@ if (istream != null) {
 		def vaultData = new JsonSlurper().parseText(jsonText)
 		project.ext.set('secretData', vaultData)
 		String confluenceauth = "${project.secretData.data.data['confluence.user']}:${project.secretData.data.data['confluence.password']}".bytes.encodeBase64()
-//		docker {
-//			//url = "https://utlxa1846:27732"
-//			//dockerPrivateRegistryUrl = "https://containers.testqa.zionsbank.com"
-//			registryCredentials {
-//				url = "https://containers.testqa.zionsbank.com"
-//				username = "${project.secretData.data.data['nexus.docker.user']}"
-//				password = "${project.secretData.data.data['nexus.docker.password']}"
-//			}
-//		}
-		tasks {
-			build {
-				dependsOn(tasks.jib)
-			}
-		}
-
 		confluence {
 			authentication "${confluenceauth}"
 			//restApiUrl 'http://utmvpw0054:8090/rest/api/'
@@ -91,12 +67,24 @@ if (istream != null) {
 			sslTrustAll true
 			//pageVariables = ['project.name': project.name]
 			parseTimeout 2000L
-
 		}
 		//System.setProperty('org.ajoberstar.grgit.auth.username', "${project.secretData.data.data['doc.token']}")
+		test {
+			//String activeProfile =  System.properties['spring.profiles.active']
+			doFirst {
+				mkdir "build/spock"
+			}
+			systemProperty "spring.profiles.active", 'test'
+			useJUnitPlatform()
+		}
+		tasks {
+			build {
+				dependsOn(tasks.jib)
+			}
+		}
 		jib {
 			from {
-				image = "${registryHostUrl}/official/openjdk:alpine-git"
+				image = "${registryHostUrl}/dts/base-images/openjdk17:latest"
 			}
 			to {
 				image = "${registryHostUrl}/dts/re-blueprintrequest"
@@ -110,35 +98,20 @@ if (istream != null) {
 				appRoot = '/app'
 				environment = ['TZ':'MST7MDT']
 				jvmFlags = ['-Xms360m', '-Xmx360m', 
+					        '-Dspring.profiles.active=' + project.targetProfile, 
 							'-Dproxy.Host=proxy.cs.zionsbank.com', 
 							'-Dproxy.Port=8080', 
 							'-Dproxy.User=', 
 							'-Dproxy.Password=']
-				volumes = ['/repos']
 				workingDirectory = '/app'
 			}
-		    extraDirectories {
-		        paths {
-		            path {
-						from = "src/main/resources/keystore"
-		                into = "/usr/lib/jvm/java-1.8-openjdk/jre/lib/security"   
-		            }		        
-				}
-		    }
 			allowInsecureRegistries = false
 		}
 	}
 }
-
-ext['groovy.version'] = '3.0.1'
-
-//sourceSets.main.resources {
-	//srcDir '../zions-pipeline-services/src/main/resources'
-//	srcDir "${vaultResources}"
-//}
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
+ext['groovy.version'] = '4.0.21'
+sourceCompatibility = 17
+targetCompatibility = 17
 repositories {
 	if ("${queue}" == 'Hosted') {
 		mavenCentral()
@@ -161,258 +134,255 @@ repositories {
 		url 'https://dist.xebialabs.com/public/maven2'
 	}
 }
-
-
-
 dependencies {
-	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-	// https://mvnrepository.com/artifact/com.github.rholder/gradle-one-jar
-	compile 'org.springframework.boot:spring-boot-starter'
-	compile('org.springframework.cloud:spring-cloud-starter-vault-config')
-	compile 'org.springframework.boot:spring-boot-starter-actuator'
-	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.1'
-	compile 'org.codehaus.groovy:groovy-dateutil:3.0.1'
-	compile 'org.codehaus.groovy:groovy-yaml:3.0.1'
-	compile 'org.codehaus.groovy:groovy-all:3.0.1'
-	compile 'org.apache.ivy:ivy:2.4.0'
-	compile 'bsf:bsf:2.4.0'
-	compile 'org.apache.logging.log4j:log4j-api:2.21.1'
-	compile 'org.apache.logging.log4j:log4j-core:2.21.1'
-	compile 'org.apache.logging.log4j:log4j-to-slf4j:2.21.1'
-	compile 'commons-io:commons-io:2.5'
-	compile 'commons-cli:commons-cli:1.3.1'
-	//compile 'org.slf4j:slf4j-api:1.7.16'
-	//		compile group: 'net.sf.json-lib', name: 'json-lib', version: '2.4'
-	//		compile group: 'xom', name: 'xom', version: '1.2.5'
-
-	compile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.2') { exclude(module: 'groovy') }
-	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile('org.springframework:spring-mock:2.0.8',
-			'cglib:cglib-nodep:3.1',
-			//'com.athaydes:spock-reports:1.6.2',
-			//files('../libs/spock-reports-1.6.2.jar'),
-			//'junit:junit:4.12'
-			//'org.junit.jupiter:junit-jupiter-api:5.5.2',
-			//'org.junit.jupiter:junit-jupiter-params:5.5.2',
-			'org.objenesis:objenesis:2.4',
-			'org.junit.platform:junit-platform-commons:1.5.2',
-			'org.codehaus.groovy:groovy-all:3.0.1',
-			'org.spockframework:spock-core:2.0-groovy-3.0',
-			//'org.spockframework:spock-junit4:2.0-M2-groovy-3.0',
-			'org.spockframework:spock-spring:2.0-groovy-3.0')
-	//testImplementation files('libs/spock-reports-1.6.2.jar')
-	//implementation ('org.junit.jupiter:junit-jupiter-api:5.5.2')
-	//testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
+	implementation("org.springframework.cloud:spring-cloud-starter-vault-config:${springCloudVersion}")
+	implementation "org.springframework.cloud:spring-cloud-starter-bootstrap:${springCloudVersion}"
+	implementation "org.springframework.boot:spring-boot-starter:${springBootVersion}"
+	implementation "org.apache.groovy:groovy-dateutil:${groovyVersion}"
+	implementation "org.apache.groovy:groovy-yaml:${groovyVersion}"
+	implementation "org.apache.groovy:groovy-xml:${groovyVersion}"
+	implementation "org.apache.groovy:groovy-json:${groovyVersion}"
+	implementation "org.apache.groovy:groovy-sql:${groovyVersion}"
+	implementation "org.apache.groovy:groovy-ant:${groovyVersion}"
 	
-	compile 'org.springframework.boot:spring-boot-starter-web'
-	//compile 'org.springframework.boot:spring-boot-starter-security'
-	compile 'com.zions.dts.services:zions-boot:latest.release'
-
-	//component specific
+	
+	
+	
+	
+		implementation "org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}"
+	
+	
+	
+	
+		implementation "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
+	
+	
+//
+	implementation "org.apache.groovy:groovy:${groovyVersion}"
+	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+	implementation 'org.apache.ivy:ivy:2.5.2'
+	implementation 'bsf:bsf:2.4.0'
+	implementation 'commons-cli:commons-cli:1.3.1'
+	implementation 'net.sf.json-lib:json-lib:2.3:jdk15'
+	constraints {
+		implementation 'commons-beanutils:commons-beanutils:1.9.4'
+		implementation 'commons-collections:commons-collections:20030418.083655'
+	}
+	implementation 'com.zions.dts.services:zions-boot:latest.release'
+	
+	testImplementation(
+			"org.springframework.boot:spring-boot-starter:${springBootVersion}",
+			"org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
+	        "org.springframework.cloud:spring-cloud-starter-vault-config:$springCloudVersion}",
+			'cglib:cglib-nodep:3.1',
+			'org.objenesis:objenesis:2.4',
+			"org.spockframework:spock-core:${spockVersion}",
+			"org.spockframework:spock-spring:${spockVersion}",
+			"io.github.joke:spock-outputcapture:4.0.1")
+			
+	testImplementation group: 'com.github.fridujo', name: 'rabbitmq-mock', version: '1.2.0'
+	
+	implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
 	if (context && context == 'release') {
-		compile 'com.zions.dts.services:zions-pipeline-services:latest.release'
-		compile 'com.zions.dts.services:zions-xld-services:latest.release'
-		compile 'com.zions.dts.services:zions-xlr-services:latest.release'
-		compile 'com.zions.dts.services:zions-vsts-services:latest.release'
-		compile 'com.zions.dts.services:zions-vsts-microservice:latest.release'
-		compile 'com.zions.dts.services:zions-common:latest.release'
-		compile 'com.zions.dts.services:zions-nexusiq-services:latest.release'
-//		compile 'com.zions.dts.services:zions-common-data:latest.release'
+		implementation "com.zions.dts.services:zions-pipeline-services:${libraryVersion}"
+		implementation "com.zions.dts.services:zions-xld-services:${libraryVersion}"
+		implementation "com.zions.dts.services:zions-xlr-services:${libraryVersion}"
+		implementation "com.zions.dts.services:zions-vsts-services:${libraryVersion}"
+		implementation "com.zions.dts.services:zions-vsts-microservice:${libraryVersion}"
+		implementation "com.zions.dts.services:zions-common:${libraryVersion}"
+		implementation "com.zions.dts.services:zions-nexusiq-services:${libraryVersion}"
+//		implementation "com.zions.dts.services:zions-common-data:${libraryVersion}"
 	} else {
-		compile project(':zions-pipeline-services')
-		compile project(':zions-xld-services')
-		compile project(':zions-xlr-services')
-		compile project(':zions-vsts-services')
-		compile project(':zions-nexusiq-services')
-		compile project(':zions-vsts-microservice')
-		compile project(':zions-common')
-		compile project(':zions-common-data')
+		implementation project(':zions-pipeline-services')
+		implementation project(':zions-xld-services')
+		implementation project(':zions-xlr-services')
+		implementation project(':zions-vsts-services')
+		implementation project(':zions-nexusiq-services')
+		implementation project(':zions-vsts-microservice')
+		implementation project(':zions-common')
+		implementation project(':zions-common-data')
 		
 	}
-
 }
-
-eclipse {
-	project {
-		referencedProjects 'zions-pipeline-services','zions-vsts-services','zions-xld-services','zions-xlr-services','zions-common'
-	}
-}
-
-
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
-}
-
-
 bootJar {
 	enabled = true
-	mainClassName = 'com.zions.pipeline.services.blueprint.BlueprintRequestApplication'
+	//mainClassName = 'null'
 	archiveName = 'zions-re-blueprint-request-microservice.jar'
-	//version =  "${version}"
 }
-
 configurations {
 	runtime.exclude module: 'zions-common-data'
 }
-
+configurations {
+	all*.exclude group: 'commons-logging', module: 'commons-logging'
+}
+	
+configurations.all {
+	resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+		if (details.requested.group == 'org.springframework' && details.requested.name == 'spring-web') {
+			details.useVersion '6.1.12'
+		}
+		else if (details.requested.group == 'org.xmlunit' && details.requested.name == 'xmlunit-core') {
+			details.useVersion '2.10.0'
+		}
+		else if (details.requested.group == 'org.apache.commons' && details.requested.name == 'commons-compress') {
+			details.useVersion '1.26.0'
+		}
+		else if (details.requested.group == 'io.netty' && details.requested.name == 'netty-handler') {
+			details.useVersion '4.1.107.Final'
+		}
+		else if (details.requested.group == 'org.springframework' && details.requested.name == 'spring-webmvc') {
+			details.useVersion '6.1.13'
+		}
+		else if (details.requested.group == 'org.apache.poi' && details.requested.name == 'poi-ooxml') {
+			details.useVersion '5.3.0'
+		}
+		else if (details.requested.group == 'org.apache.poi' && details.requested.name == 'poi') {
+			details.useVersion '5.3.0'
+		}
+	}
+}
+configurations {
+	all*.exclude group: 'org.jyaml', module: 'jyaml'
+}
 boolean doDebug = false
 if ("${debugTests}" == 'true') {
 	doDebug = true
 }
 test {
+	
+	environment 'proxy.Host', 'proxy.cs.zionsbank.com'
+	environment 'proxy.Port', '8080'
+	environment 'HTTP_PROXY', 'http://proxy.cs.zionsbank.com:8080'
+	environment 'HTTPS_PROXY', 'http://proxy.cs.zionsbank.com:8080'
+			
+	//String activeProfile =  System.properties['spring.profiles.active']
 	doFirst {
 		mkdir "build/spock"
 	}
-	systemProperty "spring.profiles.active", 'unittest'
+	//systemProperty "spring.profiles.active", 'test'
 	useJUnitPlatform()
 	debug doDebug
 }
-
-if (!context || context != 'release') {
-allprojects {
-	apply plugin: 'maven'
-	apply plugin: 'maven-publish'
-	apply plugin: 'org.springframework.boot'
-	apply plugin: 'io.spring.dependency-management'
-	apply plugin: 'groovy'
-	//	apply plugin: 'gplantuml'
-	//	apply plugin: 'mdplantuml'
+if (!context || context != 'release' || false) {
+	allprojects {
+		apply plugin: 'org.springframework.boot'
+		apply plugin: 'io.spring.dependency-management'
+		apply plugin: 'groovy'
+		//	apply plugin: 'gplantuml'
+		//	apply plugin: 'mdplantuml'
+		
 	
-
-	ext['groovy.version'] = '3.0.1'
-
-//	sourceSets.main.resources {
-		//srcDir '../common/groovydoc'
-//		srcDir "${vaultResources}"
-//	}
-
-
-
-	//version = '1.0.0-SNAPSHOT'
-	sourceCompatibility = 1.8
-	targetCompatibility = 1.8
-
-	repositories {
-		if ("${queue}" == 'Hosted') {
-			mavenCentral()
-			maven {
-				name 'spring'
-				url "http://repo.spring.io/plugins-release/"
-			}
-		}
-		mavenLocal()
-		maven {
-			name 'ZionsNexusPublicSnapshots'
-			url "${nexusUrl}/repository/public-snapshots/"
-		}
-		maven {
-			name 'ZionsNexusPublic'
-			url "${nexusUrl}/repository/public/"
-		}
-		//mavenCentral()
-		maven {
-			url 'https://dist.xebialabs.com/public/maven2'
-		}
-	}
-
-	dependencies {
-		// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-		// https://mvnrepository.com/artifact/com.github.rholder/gradle-one-jar
-		compile 'org.springframework.boot:spring-boot-starter'
-		compile('org.springframework.cloud:spring-cloud-starter-vault-config')
-		compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.1'
-		compile 'org.codehaus.groovy:groovy-dateutil:3.0.1'
-		compile 'org.codehaus.groovy:groovy-yaml:3.0.1'
-		compile 'org.codehaus.groovy:groovy-all:3.0.1'
-		compile 'org.apache.ivy:ivy:2.4.0'
-		compile 'bsf:bsf:2.4.0'
-		compile 'org.apache.logging.log4j:log4j-api:2.21.1'
-		compile 'org.apache.logging.log4j:log4j-core:2.21.1'
-		compile 'org.apache.logging.log4j:log4j-to-slf4j:2.21.1'
-		compile 'commons-io:commons-io:2.5'
-		compile 'commons-cli:commons-cli:1.3.1'
-		//compile 'org.slf4j:slf4j-api:1.7.16'
-		//		compile group: 'net.sf.json-lib', name: 'json-lib', version: '2.4'
-		//		compile group: 'xom', name: 'xom', version: '1.2.5'
-
-		compile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.2') { exclude(module: 'groovy') }
-
-		testCompile(
-				'org.springframework.boot:spring-boot-starter-test',
-				'org.springframework:spring-mock:2.0.8',
-				'cglib:cglib-nodep:3.1',
-				//'com.athaydes:spock-reports:1.6.2',
-				//files('../libs/spock-reports-1.6.2.jar'),
-				//'junit:junit:4.12'
-				'org.junit.jupiter:junit-jupiter-api:5.6.2',
-				'org.junit.jupiter:junit-jupiter-params:5.6.2',
-				'org.objenesis:objenesis:2.4',
-				'org.codehaus.groovy:groovy-all:3.0.1',
-				'org.spockframework:spock-core:2.0-groovy-3.0',
-				//'org.spockframework:spock-junit4:2.0-M2-groovy-3.0',
-				'org.spockframework:spock-spring:2.0-groovy-3.0'
-				)
-		//testImplementation files('libs/spock-reports-1.6.2.jar')
-		//implementation ('org.junit.jupiter:junit-jupiter-api:5.5.2')
-		testRuntime('org.junit.jupiter:junit-jupiter-engine:5.6.2')
-	}
-
-	dependencyManagement {
-		imports {
-			mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-		}
-	}
-	task mdplantuml {
-		doLast {
-			ant.exec(executable: 'cmd', dir: './', failonerror: true ) {
-				arg( line: "/c \"java -jar ../libs/plantuml.1.2021.0.jar src/**/*.md -tsvg\"")
-			}
-		}
-	}
-	task gplantuml {
-		doLast {
-			ant.exec(executable: 'cmd', dir: './', failonerror: true ) {
-				arg( line: "/c \"java -jar ../libs/plantuml.1.2021.0.jar src/**/*.groovy -tsvg\"")
-			}
-		}
-	}
-	test {
-		//String activeProfile =  System.properties['spring.profiles.active']
-		doFirst {
-			mkdir "build/spock"
-		}
-		systemProperty "spring.profiles.active", 'test'
-		useJUnitPlatform()
-	}
-
-	uploadArchives {
-		/**
-		 * Code to use Maven settings.xml for server creds for uploadArchives
-		 */
-		def nexusUsername = "${project.secretData.data.data['nexus.deployment.user']}"
-		def nexusPassword = "${project.secretData.data.data['nexus.deployment.password']}"
+		ext['groovy.version'] = '4.0.21'
+		
+		//version = '1.0.0-SNAPSHOT'
+		sourceCompatibility = 17
+		targetCompatibility = 17
+	
 		repositories {
-			mavenDeployer {
-				repository(url: "${nexusUrl}/repository/releases") {
-					authentication(userName: nexusUsername, password: nexusPassword)
+			if ("${queue}" == 'Hosted') {
+				mavenCentral()
+				maven {
+					name 'spring'
+					url "http://repo.spring.io/plugins-release/"
 				}
-	//			snapshotRepository(url: "${nexusUrl}/repository/maven-snapshots") {
-	//				authentication(userName: nexusUsername, password: nexusPassword)
-	//			}
-				addFilter("${rootProject.name}") {artifact, file ->
-					artifact.name != "${rootProject.name}"
-				}
-	//			addFilter("${project.name}") {artifact, file ->
-	//				artifact.name == "${project.name}"
-	//			}
-				
-				pom.version = "${version}"
-				pom.artifactId = "${project.name}"
-				pom.groupId = "com.zions.dts.services"
+			}
+			mavenLocal()
+			maven {
+				name 'ZionsNexusPublicSnapshots'
+				url "${nexusUrl}/repository/public-snapshots/"
+			}
+			maven {
+				name 'ZionsNexusPublic'
+				url "${nexusUrl}/repository/public/"
+			}
+			//mavenCentral()
+			maven {
+				url 'https://dist.xebialabs.com/public/maven2'
 			}
 		}
+	
+		dependencies {
+			// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+			// https://mvnrepository.com/artifact/com.github.rholder/gradle-one-jar
+			implementation "org.springframework.boot:spring-boot-starter:${springBootVersion}"
+			implementation("org.springframework.cloud:spring-cloud-starter-vault-config:${springCloudVersion}")
+			implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.1'
+			implementation "org.apache.groovy:groovy-dateutil:${groovyVersion}"
+			implementation "org.apache.groovy:groovy-yaml:${groovyVersion}"
+			implementation "org.apache.groovy:groovy-xml:${groovyVersion}"
+			implementation "org.apache.groovy:groovy-json:${groovyVersion}"
+			implementation "org.apache.groovy:groovy-sql:${groovyVersion}"
+			implementation "org.apache.groovy:groovy:${groovyVersion}"
+			implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+			implementation 'org.apache.ivy:ivy:2.4.0'
+			implementation 'bsf:bsf:2.4.0'
+			implementation 'commons-io:commons-io:2.11.0'
+			implementation 'commons-cli:commons-cli:1.3.1'
+			implementation 'commons-lang:commons-lang:2.6'
+			constraints {
+				// Upgrade commons libraries that have vulnerabilities
+				//implementation('net.sf.json-lib:json-lib:2.3')
+				constraints {
+					implementation 'commons-beanutils:commons-beanutils:1.9.4'
+					implementation 'commons-collections:commons-collections:20030418.083655'
+				}
+			}
+		
+	
+			testImplementation(
+					'org.springframework.boot:spring-boot-starter-test:3.3.2',
+					'org.springframework:spring-mock:2.0.8',
+					'cglib:cglib-nodep:3.1',
+					'org.objenesis:objenesis:2.4',
+					"org.spockframework:spock-core:2.4-M1-groovy-4.0",
+					"org.spockframework:spock-spring:2.4-M1-groovy-4.0")
+		}
+	
+//		dependencyManagement {
+//			imports {
+//				mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+//			}
+//		}
+		test {
+			//String activeProfile =  System.properties['spring.profiles.active']
+			doFirst {
+				mkdir "build/spock"
+			}
+			systemProperty "spring.profiles.active", 'test'
+			useJUnitPlatform()
+		}
+		        
+        configurations.all {
+        	resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        		if (details.requested.group == 'org.springframework' && details.requested.name == 'spring-web') {
+        			details.useVersion '6.1.12'
+        		}
+        		else if (details.requested.group == 'org.xmlunit' && details.requested.name == 'xmlunit-core') {
+        			details.useVersion '2.10.0'
+        		}
+        		else if (details.requested.group == 'org.apache.commons' && details.requested.name == 'commons-compress') {
+        			details.useVersion '1.26.0'
+        		}
+        		else if (details.requested.group == 'io.netty' && details.requested.name == 'netty-handler') {
+        			details.useVersion '4.1.107.Final'
+        		}
+        		else if (details.requested.group == 'org.springframework' && details.requested.name == 'spring-webmvc') {
+        			details.useVersion '6.1.13'
+        		}
+        		else if (details.requested.group == 'org.apache.poi' && details.requested.name == 'poi-ooxml') {
+        			details.useVersion '5.3.0'
+        		}
+        		else if (details.requested.group == 'org.apache.poi' && details.requested.name == 'poi') {
+        			details.useVersion '5.3.0'
+        		}
+        	}
+        
+        }
+        configurations {
+        	all*.exclude group: 'org.jyaml', module: 'jyaml'
+        }
+		
 	}
 }
-}
+	
+	

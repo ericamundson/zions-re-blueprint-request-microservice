@@ -17,14 +17,13 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
 import org.springframework.boot.autoconfigure.ldap.LdapAutoConfiguration
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
-import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration
 
 
 /* 
  * Provide API for blueprint loading and execution. 
  */
 
-@SpringBootApplication(exclude=[LdapAutoConfiguration,RabbitAutoConfiguration,MongoAutoConfiguration,MongoDataAutoConfiguration,EmbeddedMongoAutoConfiguration])
+@SpringBootApplication(exclude=[LdapAutoConfiguration,RabbitAutoConfiguration,MongoAutoConfiguration,MongoDataAutoConfiguration])
 public class BlueprintRequestApplication {
 
 

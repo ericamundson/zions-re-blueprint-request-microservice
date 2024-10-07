@@ -17,9 +17,8 @@ import org.springframework.mail.javamail.JavaMailSenderImpl
 
 import com.zions.common.services.cache.ICacheManagementService
 import com.zions.common.services.command.CommandManagementService
-import com.mongodb.MongoClient
-import com.mongodb.MongoCredential
-import com.mongodb.MongoClientOptions
+import com.mongodb.client.MongoClient
+import com.mongodb.client.MongoClients
 import com.mongodb.ServerAddress
 import com.zions.common.services.cache.CacheManagementService
 import com.zions.common.services.rest.IGenericRestClient
@@ -110,23 +109,8 @@ public class AppConfig  {
 	String password
 
 	@Bean
-	public MongoClientOptions mongoOptions() {
-		return MongoClientOptions.builder().maxConnectionIdleTime(1000 * 60 * 8).socketTimeout(30000).build();
-	}
-
-	@Bean
 	MongoClient mongoClient() throws UnknownHostException {
-		MongoCredential c = null
-		if (userName != null) {
-			c = MongoCredential.createCredential(userName, 'admin', password as char[])
-		}
-		ServerAddress a = new ServerAddress(dbHost)
-		MongoClient client = null
-		if (c == null) {
-			client = new MongoClient(a, mongoOptions());
-		} else {
-			client = new MongoClient(a, c, mongoOptions());
-		}
+		MongoClient client = MongoClients.create("mongodb://${userName}:${password}@${dbHost}/")
 		
 		return client
 	}
