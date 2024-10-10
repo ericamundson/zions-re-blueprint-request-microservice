@@ -14,7 +14,7 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_SHOW_CODEDETAILS_IN_EXCEPTION_MESSAGES" value="true"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_CLASSPATH_ONLY_JAR" value="false"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.zions.pipeline.services.blueprint.BlueprintRequestApplication"/>
-    <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value=""/>
+    <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="zions-re-blueprint-request-microservice"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="zions-re-blueprint-request-microservice"/>
-    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dspring.profiles.active=k8sprod"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dspring.profiles.active=k8stest"/>
 </launchConfiguration>

@@ -17,4 +17,4 @@ if (!context || context != 'release') {
 	project(':zions-common').projectDir = new File(settingDir, '../zions-service-framework/zions-common')
 	include ':zions-common-data'
 	project(':zions-common-data').projectDir = new File(settingDir, '../zions-service-framework/zions-common-data')
-}
+}
