@@ -26,12 +26,16 @@ extends:
     build_pool_name: ${{ parameters.pool_name }}
     build_pool_demands:
     - "agent.os -equals Linux"
-   
     build_steps:
+    - template: templates/step/install-tools.yaml@zions-ado-templates
+      parameters:
+        tools:
+        - name: java
+          version: 17
     - template: /templates/step/build/gradle.yaml@zions-ado-templates
       parameters:
         gradleWrapperFile: $(Build.SourcesDirectory)/gradlew
         workingDirectory: $(Build.SourcesDirectory)
         options: '-b build.gradle --no-scan --refresh-dependencies -x jib -Pcontext=release -PvaultResources=/app/Vault/resources'
         tasks: 'clean build'
-        publishJUnitResults: true   
+        publishJUnitResults: true	      

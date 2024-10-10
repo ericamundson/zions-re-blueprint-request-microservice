@@ -36,7 +36,6 @@ extends:
     - "agent.os -equals Linux"
     build_tagbuild_InitialVersionPrefix: 0.0.1
     build_tagbuild_NodeBuild: false
-   
     build_steps:
     - template: templates/step/install-tools.yaml@zions-ado-templates
       parameters:
@@ -49,7 +48,7 @@ extends:
         workingDirectory: $(Build.SourcesDirectory)
         options: '-b build.gradle --no-scan --refresh-dependencies -Pcontext=release -PvaultResources=/app/Vault/resources -Pversion=$(zionsbuildnumber)'
         tasks: 'clean build'
-        publishJUnitResults: true   
+        publishJUnitResults: true
     
     build_scan_object: 
       nexusiq_scanTargets: "build/libs/*.jar"
